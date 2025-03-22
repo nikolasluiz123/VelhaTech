@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_dialog_title">Erro</string>
+    <string name="warning_dialog_title">Aviso</string>
+    <string name="information_dialog_title">Informação</string>
+</resources>
