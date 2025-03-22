@@ -2,4 +2,12 @@
 <resources>
     <string name="label_add">Adicionar</string>
     <string name="label_save">Salvar</string>
+    <string name="description_icon_hide_password">Esconder senha</string>
+    <string name="description_icon_show_password">Mostrar senha</string>
+    <string name="rounded_button_google_content_description">Botão Google</string>
+    <string name="label_ok">OK</string>
+    <string name="label_confirm">Confirmar</string>
+    <string name="label_cancel">Cancelar</string>
+    <string name="label_voltar">Voltar</string>
+    <string name="label_logout">Logout</string>
 </resources>

@@ -22,16 +22,14 @@ import br.com.velhatech.core.theme.VelhaTechTheme
 fun FloatingActionButtonSave(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    iconColor: Color = Color.White
 ) {
     FitnessProFloatingActionButton(
         modifier = modifier,
-        onClick = onClick
+        onClick = onClick,
     ) {
         Icon(
             painter = painterResource(id = br.com.velhatech.core.R.drawable.ic_check_24dp),
             contentDescription = stringResource(R.string.label_save),
-            tint = iconColor
         )
     }
 }

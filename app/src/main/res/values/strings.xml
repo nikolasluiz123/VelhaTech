@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">VelhaTech</string>
+    <string name="unknown_error_message">Ocorreu um erro inesperado, se o erro persistir contate o suporte.</string>
+    <string name="login_screen_label_email">E-mail</string>
+    <string name="login_screen_label_password">Senha</string>
+    <string name="login_screen_label_button_login">Login</string>
+    <string name="login_screen_label_button_register">Registrar-se</string>
+    <string name="register_user_screen_label_email">E-mail *</string>
+    <string name="register_user_login_screen_label_password">Senha *</string>
+    <string name="register_user_screen_label_name">Nome *</string>
+    <string name="label_user_name">Nome</string>
+    <string name="label_user_email">E-mail</string>
+    <string name="label_user_password">Senha</string>
+    <string name="validation_msg_email_in_use">O e-mail já está em uso.</string>
+    <string name="validation_msg_invalid_credetials_login">E-mail ou Senha incorretos, por favor, redigite.</string>
+    <string name="network_error_message">Você precisa ter conexão com a internet para realizar esta operação.</string>
+    <string name="login_google_unknown_error">Ocorreu um erro desconhecido e não foi possível realizar a autenticação com o Google.</string>
+    <string name="register_user_screen_title">Novo Jogador</string>
+    <string name="register_user_screen_success_message">Usuário salvo com sucesso</string>
 </resources>

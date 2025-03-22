@@ -23,7 +23,9 @@ fun FitnessProFloatingActionButton(
 ) {
     FloatingActionButton(
         modifier = modifier,
-        onClick = onClick
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
     ) {
         content()
     }

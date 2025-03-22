@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlinAndroidKsp)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -35,8 +37,18 @@ android {
 dependencies {
     implementation(project(":velha-tech-core"))
 
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+
+    implementation(libs.google.play.auth)
+    implementation(libs.google.credentials)
+    implementation(libs.google.credentials.play.services)
+    implementation(libs.google.id)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
