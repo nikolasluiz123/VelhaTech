@@ -38,3 +38,10 @@ fun FirebaseAnalytics.logSimpleFilterClick(enum: Enum<*>) {
         param(FirebaseAnalytics.Param.ITEM_ID, enum.name)
     }
 }
+
+fun FirebaseAnalytics.logRadioButtonClick(enumItemId: Enum<*>, enumValue: Enum<*>) {
+    logEvent(EnumAnalyticsEvents.SIMPLE_FILTER.name) {
+        param(FirebaseAnalytics.Param.ITEM_ID, enumItemId.name)
+        param(FirebaseAnalytics.Param.VALUE, enumValue.name)
+    }
+}

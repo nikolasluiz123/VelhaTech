@@ -8,14 +8,20 @@ import br.com.velhatech.components.fields.state.TextField
 import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.core.validation.FieldValidationError
+import br.com.velhatech.firebase.apis.analytics.logRadioButtonClick
 import br.com.velhatech.firebase.enums.EnumDifficultLevel
 import br.com.velhatech.screen.common.callback.OnSaveLessFailureCallback
+import br.com.velhatech.screen.roomcreation.enums.EnumRoomTags
+import br.com.velhatech.screen.roomcreation.enums.EnumRoomTags.*
 import br.com.velhatech.screen.roomcreation.enums.EnumRoundType
 import br.com.velhatech.screen.roomcreation.enums.EnumValidatedRoomCreationFields
 import br.com.velhatech.screen.roomcreation.enums.EnumValidatedRoomCreationFields.*
 import br.com.velhatech.state.RoomUIState
 import br.com.velhatech.usecase.SaveRoomUseCase
 import br.com.velhatech.viewmodel.common.VelhaTechViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -95,6 +101,8 @@ class RoomViewModel @Inject constructor(
     private fun initializeRoundsRadioButtonField(): RadioButtonField<EnumRoundType> {
         return RadioButtonField(
             onOptionSelected = {
+                Firebase.analytics.logRadioButtonClick(ROOM_SCREEN_ROUND_RADIO_BUTTON, it.value)
+
                 _uiState.value = _uiState.value.copy(
                     toRoom = _uiState.value.toRoom.copy(
                         roundsCount = getRoundsCountFrom(it)
@@ -115,6 +123,8 @@ class RoomViewModel @Inject constructor(
     private fun initializeDifficultLevelRadioButtonField(): RadioButtonField<EnumDifficultLevel> {
         return RadioButtonField(
             onOptionSelected = {
+                Firebase.analytics.logRadioButtonClick(ROOM_SCREEN_DIFFICULT_LEVEL_RADIO_BUTTON, it.value)
+
                 _uiState.value = _uiState.value.copy(
                     toRoom = _uiState.value.toRoom.copy(
                         difficultLevel = it.value
