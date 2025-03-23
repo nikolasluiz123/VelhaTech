@@ -6,8 +6,8 @@ data class RoomDocument(
     var id: String = UUID.randomUUID().toString(),
     val roomName: String? = null,
     val roundsCount: Int? = null,
-    val maxPlayers: Int? = null,
-    val playersCount: Int? = null,
+    val maxPlayers: Int = 2,
+    val playersCount: Int = 1,
     val difficultLevel: String? = null,
     val password: String? = null
 ) {

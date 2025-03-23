@@ -6,8 +6,8 @@ data class TORoom(
     val id: String? = null,
     var roomName: String? = null,
     var roundsCount: Int? = null,
-    var maxPlayers: Int? = null,
-    var playersCount: Int? = null,
+    var maxPlayers: Int = 2,
+    var playersCount: Int = 1,
     var difficultLevel: EnumDifficultLevel? = null,
     var password: String? = null
 ) {
