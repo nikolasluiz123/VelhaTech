@@ -5,5 +5,6 @@ enum class EnumAnalyticsEvents {
     BOTTOM_SHEET_ITEM_CLICK,
     TAB_CLICK,
     TAB_SCROLL,
-    LIST_ITEM_CLICK
+    LIST_ITEM_CLICK,
+    SIMPLE_FILTER
 }

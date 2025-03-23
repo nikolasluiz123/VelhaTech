@@ -26,8 +26,12 @@ import br.com.velhatech.components.list.LazyVerticalList
 import br.com.velhatech.components.topbar.SimpleVelhaTechTopAppBar
 import br.com.velhatech.core.extensions.calculatePaddingTopWithoutMargin
 import br.com.velhatech.core.theme.VelhaTechTheme
+import br.com.velhatech.firebase.apis.analytics.logButtonClick
+import br.com.velhatech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velhatech.state.RoomListUIState
 import br.com.velhatech.viewmodel.RoomListViewModel
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun RoomListScreen(
@@ -56,6 +60,8 @@ fun RoomListScreen(
                 customNavigationIcon = {
                     IconButtonAccount(
                         onClick = {
+                            Firebase.analytics.logButtonClick(EnumRoomListTags.ROOM_LIST_SCREEN_ACCOUNT_BUTTON)
+
                             // TODO - Perfil
                         }
                     )
@@ -67,14 +73,20 @@ fun RoomListScreen(
                 actions = {
                     IconButtonRanking(
                         onClick = {
+                            Firebase.analytics.logButtonClick(EnumRoomListTags.ROOM_LIST_SCREEN_RANKING_BUTTON)
 
+                            // TODO - Rankin
                         }
                     )
                 },
                 floatingActionButton = {
                     FloatingActionButtonAdd(
                         isBottomBar = true,
-                        onClick = onNavigateToRoomCreation
+                        onClick = {
+                            Firebase.analytics.logButtonClick(EnumRoomListTags.ROOM_LIST_SCREEN_ADD_ROOM_BUTTON)
+
+                            onNavigateToRoomCreation()
+                        }
                     )
                 }
             )

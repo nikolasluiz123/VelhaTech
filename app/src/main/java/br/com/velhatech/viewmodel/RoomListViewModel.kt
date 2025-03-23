@@ -5,9 +5,13 @@ import br.com.velhatech.R
 import br.com.velhatech.components.filter.SimpleFilterState
 import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
+import br.com.velhatech.firebase.apis.analytics.logSimpleFilterClick
 import br.com.velhatech.repository.RoomRepository
+import br.com.velhatech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velhatech.state.RoomListUIState
 import br.com.velhatech.viewmodel.common.VelhaTechViewModel
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -44,6 +48,8 @@ class RoomListViewModel @Inject constructor(
                 // TODO - Pensar no filtro depois
             },
             onExpandedChange = {
+                Firebase.analytics.logSimpleFilterClick(EnumRoomListTags.ROOM_LIST_SCREEN_FILTER)
+
                 _uiState.value = _uiState.value.copy(
                     simpleFilterState = _uiState.value.simpleFilterState.copy(expanded = false)
                 )
