@@ -30,7 +30,7 @@ fun MenuIconButton(
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun MenuIconButtonPreview() {
     VelhaTechTheme {

@@ -31,7 +31,7 @@ fun IconButtonArrowBack(
 }
 
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun IconButtonArrowBackPreview() {
     VelhaTechTheme {

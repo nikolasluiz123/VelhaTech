@@ -323,7 +323,7 @@ fun OutlinedTextFieldPasswordValidation(
     )
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun OutlinedTextFieldValidationPreview() {
     VelhaTechTheme {
@@ -340,7 +340,7 @@ fun OutlinedTextFieldValidationPreview() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun OutlinedTextFieldValidationWithoutErrorPreview() {
     VelhaTechTheme {

@@ -139,7 +139,7 @@ private fun DialogTextButton(
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun VelhaTechDialogMessageErrorPreview() {
     VelhaTechTheme {
@@ -154,7 +154,7 @@ private fun VelhaTechDialogMessageErrorPreview() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun VelhaTechDialogMessageConfirmationPreview() {
     VelhaTechTheme {
@@ -169,7 +169,7 @@ private fun VelhaTechDialogMessageConfirmationPreview() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun VelhaTechDialogMessageInformationPreview() {
     VelhaTechTheme {

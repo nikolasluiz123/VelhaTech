@@ -207,7 +207,7 @@ fun LoginScreen(
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun LoginScreenPreviewDark() {
     VelhaTechTheme(darkTheme = true) {
@@ -217,7 +217,7 @@ private fun LoginScreenPreviewDark() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun LoginScreenPreviewLight() {
     VelhaTechTheme(darkTheme = false) {

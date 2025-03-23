@@ -2,6 +2,7 @@ package br.com.velhatech.components.buttons.fab
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,22 +23,23 @@ import br.com.velhatech.core.theme.VelhaTechTheme
 @Composable
 fun FloatingActionButtonAdd(
     modifier: Modifier = Modifier,
-    iconColor: Color = LocalContentColor.current,
-    onClick: () -> Unit = { }
+    isBottomBar: Boolean = false,
+    onClick: () -> Unit = { },
 ) {
     FitnessProFloatingActionButton(
         modifier = modifier,
+        isBottomBar = isBottomBar,
         onClick = onClick
     ) {
         Icon(
             painter = painterResource(id = br.com.velhatech.core.R.drawable.ic_add_24dp),
             contentDescription = stringResource(R.string.label_add),
-            tint = iconColor
+            tint = if (isBottomBar) MaterialTheme.colorScheme.onPrimaryContainer else LocalContentColor.current
         )
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun FloatingActionButtonAddPreview() {
     VelhaTechTheme {

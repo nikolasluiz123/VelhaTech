@@ -81,7 +81,7 @@ fun FitnessProTopAppBar(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun FitnessProTopAppBarPreview() {
     VelhaTechTheme {
@@ -96,7 +96,7 @@ fun FitnessProTopAppBarPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun FitnessProTopAppBarWithSubtitlePreview() {
     VelhaTechTheme {

@@ -93,7 +93,7 @@ fun VelhaTechTextButton(
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun FitnessProButtonPreview() {
     VelhaTechTheme {
@@ -106,7 +106,7 @@ private fun FitnessProButtonPreview() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun FitnessProOutlinedButtonPreview() {
     VelhaTechTheme {
@@ -119,7 +119,7 @@ private fun FitnessProOutlinedButtonPreview() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun FitnessProTextButtonPreview() {
     VelhaTechTheme {

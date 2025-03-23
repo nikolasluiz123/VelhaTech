@@ -94,7 +94,7 @@ val LabelFontWeightMediumTextStyle = LabelTextStyle.copy(
 
 val ValueTextStyle = TextStyle(
     fontFamily = FontFamily.SansSerif,
-    fontWeight = FontWeight.Normal,
+    fontWeight = FontWeight.Light,
     fontSize = 12.sp,
     lineHeight = 16.sp,
     letterSpacing = 0.2.sp

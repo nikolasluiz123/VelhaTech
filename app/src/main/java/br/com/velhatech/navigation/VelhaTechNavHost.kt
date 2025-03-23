@@ -17,7 +17,7 @@ fun VelhaTechNavHost(
     ) {
 
         loginScreen(
-            onNavigateToRoomList = { },
+            onNavigateToRoomList = navController::navigateToRoomListScreen,
             onNavigateToRegisterUser = navController::navigateToRegisterUserScreen
         )
 

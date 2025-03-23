@@ -194,7 +194,7 @@ private fun showSaveSuccessMessage(
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun RegisterUserScreenPreviewDark() {
     VelhaTechTheme(darkTheme = true) {
@@ -204,7 +204,7 @@ private fun RegisterUserScreenPreviewDark() {
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun RegisterUserScreenPreviewLight() {
     VelhaTechTheme(darkTheme = false) {

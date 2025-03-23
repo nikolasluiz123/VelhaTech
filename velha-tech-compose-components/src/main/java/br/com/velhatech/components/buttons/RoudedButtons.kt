@@ -43,7 +43,7 @@ fun RoundedGoogleButton(
     }
 }
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 private fun RoundedGoogleButtonPreview() {
     VelhaTechTheme {

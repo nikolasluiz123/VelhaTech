@@ -17,4 +17,14 @@
     <string name="login_google_unknown_error">Ocorreu um erro desconhecido e não foi possível realizar a autenticação com o Google.</string>
     <string name="register_user_screen_title">Novo Jogador</string>
     <string name="register_user_screen_success_message">Usuário salvo com sucesso</string>
+    <string name="room_list_screen_title">Seja Bem-Vindo</string>
+    <string name="room_list_screen_filter_placeholder">Buscar por Sala</string>
+    <string name="room_list_item_label_room">Sala</string>
+    <string name="room_list_item_label_rounds">Rodadas</string>
+    <string name="room_list_item_players_value">%1$s/%2$s</string>
+    <string name="room_list_item_lock_icon_description">Sala bloqueada com senha</string>
+    <string name="room_list_item_lock_open_icon_description">Sala sem senha</string>
+    <string name="room_list_item_label_difficult_level">Dificuldade</string>
+    <string name="room_list_item_label_players">Jogadores</string>
+    <string name="room_list_screen_empty_message">Não foram encontradas salas criadas, você pode criar a sua própria</string>
 </resources>

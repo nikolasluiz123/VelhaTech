@@ -18,14 +18,15 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun FitnessProFloatingActionButton(
     modifier: Modifier = Modifier,
+    isBottomBar: Boolean = false,
     onClick: () -> Unit = { },
     content: @Composable () -> Unit
 ) {
     FloatingActionButton(
         modifier = modifier,
         onClick = onClick,
-        containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onPrimary,
+        containerColor = if (isBottomBar) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary,
+        contentColor = if (isBottomBar) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
     ) {
         content()
     }

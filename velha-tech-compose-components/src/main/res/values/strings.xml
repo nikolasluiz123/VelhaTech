@@ -10,4 +10,7 @@
     <string name="label_cancel">Cancelar</string>
     <string name="label_voltar">Voltar</string>
     <string name="label_logout">Logout</string>
+    <string name="label_placeholder_example">Buscar por campo1 ou campo2</string>
+    <string name="label_ranking">Classificações</string>
+    <string name="label_account">Conta</string>
 </resources>

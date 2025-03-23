@@ -1,6 +1,8 @@
 package br.com.velhatech.components.buttons.fab
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,21 +24,24 @@ import br.com.velhatech.core.theme.VelhaTechTheme
 fun FloatingActionButtonSave(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isBottomBar: Boolean = false,
 ) {
     FitnessProFloatingActionButton(
         modifier = modifier,
         onClick = onClick,
+        isBottomBar = isBottomBar
     ) {
         Icon(
             painter = painterResource(id = br.com.velhatech.core.R.drawable.ic_check_24dp),
             contentDescription = stringResource(R.string.label_save),
+            tint = if (isBottomBar) MaterialTheme.colorScheme.onPrimaryContainer else LocalContentColor.current
         )
     }
 }
 
 
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun FloatingActionButtonSavePreview() {
     VelhaTechTheme {

@@ -26,7 +26,7 @@ fun IconButtonMoreVert(onClick: () -> Unit = { }) {
 
 
 
-@Preview
+@Preview(device = "id:small_phone")
 @Composable
 fun IconButtonMoreVertPreview() {
     VelhaTechTheme {
