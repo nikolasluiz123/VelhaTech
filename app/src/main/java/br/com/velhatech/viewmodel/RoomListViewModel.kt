@@ -6,6 +6,7 @@ import br.com.velhatech.components.filter.SimpleFilterState
 import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.firebase.apis.analytics.logSimpleFilterClick
+import br.com.velhatech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velhatech.repository.RoomRepository
 import br.com.velhatech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velhatech.state.RoomListUIState
@@ -22,7 +23,8 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class RoomListViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val commonFirebaseAuthService: CommonFirebaseAuthenticationService
 ): VelhaTechViewModel(context) {
 
     private val _uiState: MutableStateFlow<RoomListUIState> = MutableStateFlow(RoomListUIState())
@@ -36,6 +38,7 @@ class RoomListViewModel @Inject constructor(
     private fun initialLoadUIState() {
         _uiState.update {
             it.copy(
+                subtitle = commonFirebaseAuthService.getAuthenticatedUser()?.name,
                 messageDialogState = initializeMessageDialogState(),
                 simpleFilterState = initializeSimpleFilterState()
             )
