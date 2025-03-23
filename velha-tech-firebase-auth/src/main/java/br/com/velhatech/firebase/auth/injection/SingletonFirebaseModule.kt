@@ -1,6 +1,7 @@
 package br.com.velhatech.firebase.auth.injection
 
 import android.content.Context
+import br.com.velhatech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velhatech.firebase.auth.implementations.FirebaseDefaultAuthenticationService
 import br.com.velhatech.firebase.auth.implementations.FirebaseGoogleAuthenticationService
 import dagger.Module
@@ -23,6 +24,11 @@ class SingletonFirebaseModule {
         @ApplicationContext context: Context
     ): FirebaseGoogleAuthenticationService {
         return FirebaseGoogleAuthenticationService(context)
+    }
+
+    @Provides
+    fun provideCommonFirebaseAuthenticationService(): CommonFirebaseAuthenticationService {
+        return CommonFirebaseAuthenticationService()
     }
 
 }

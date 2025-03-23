@@ -37,4 +37,5 @@
     <string name="label_rounds_count">Quantidade de Rodadas</string>
     <string name="label_difficulty_level">Dificuldade</string>
     <string name="room_screen_success_message">Sala salva com sucesso</string>
+    <string name="splash_screen_ic_launcher_description">App Logo</string>
 </resources>
