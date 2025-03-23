@@ -147,7 +147,7 @@ fun RoomScreen(
                 )
 
                 OutlinedTextFieldPasswordValidation(
-                    field = state.roomName,
+                    field = state.roomPassword,
                     label = stringResource(R.string.room_screen_label_password),
                     keyboardOptions = PasswordKeyboardOptions,
                     modifier = Modifier.constrainAs(passwordRef) {
