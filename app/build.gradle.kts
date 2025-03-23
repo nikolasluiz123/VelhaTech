@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.performance)
 
     implementation(libs.google.gson)
     implementation(libs.google.play.auth)
