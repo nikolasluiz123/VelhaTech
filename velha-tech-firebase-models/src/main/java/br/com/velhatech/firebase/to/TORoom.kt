@@ -4,12 +4,12 @@ import br.com.velhatech.firebase.enums.EnumDifficultLevel
 
 data class TORoom(
     val id: String? = null,
-    val roomName: String? = null,
-    val roundsCount: Int? = null,
-    val maxPlayers: Int? = null,
-    val playersCount: Int? = null,
-    val difficultLevel: EnumDifficultLevel? = null,
-    val password: String? = null
+    var roomName: String? = null,
+    var roundsCount: Int? = null,
+    var maxPlayers: Int? = null,
+    var playersCount: Int? = null,
+    var difficultLevel: EnumDifficultLevel? = null,
+    var password: String? = null
 ) {
     fun isRequireAuth() = !password.isNullOrEmpty()
 }

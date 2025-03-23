@@ -3,4 +3,6 @@
     <string name="enum_difficult_level_easy">Fácil</string>
     <string name="enum_difficult_level_medium">Médio</string>
     <string name="enum_difficult_level_hard">Difícil</string>
+    <string name="enum_round_type_md3">Melhor de 3</string>
+    <string name="enum_round_type_md5">Melhor de 5</string>
 </resources>

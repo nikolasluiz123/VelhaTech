@@ -32,7 +32,7 @@ import br.com.velhatech.core.theme.VelhaTechTheme
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FitnessProTopAppBar(
+fun VelhaTechTopAppBar(
     title: @Composable () -> Unit,
     onBackClick: () -> Unit,
     onLogoutClick: () -> Unit = { },
@@ -46,7 +46,6 @@ fun FitnessProTopAppBar(
     ),
     showNavigationIcon: Boolean = true,
     customNavigationIcon: (@Composable () -> Unit)? = null,
-    showMenuWithLogout: Boolean = true,
     showMenu: Boolean = false,
     windowInsets: WindowInsets = WindowInsets(0.dp),
 ) {
@@ -68,12 +67,7 @@ fun FitnessProTopAppBar(
         actions = {
             actions()
 
-            if (showMenuWithLogout) {
-                MenuIconButtonWithDefaultActions(
-                    onLogoutClick = onLogoutClick,
-                    menuItems = menuItems,
-                )
-            } else if (showMenu) {
+            if (showMenu) {
                 MenuIconButton(menuItems)
             }
         }
@@ -86,7 +80,7 @@ fun FitnessProTopAppBar(
 fun FitnessProTopAppBarPreview() {
     VelhaTechTheme {
         Surface {
-            FitnessProTopAppBar(
+            VelhaTechTopAppBar(
                 title = { Text("Título da Tela") },
                 onBackClick = { },
                 onLogoutClick = { }
@@ -104,7 +98,6 @@ fun FitnessProTopAppBarWithSubtitlePreview() {
             SimpleVelhaTechTopAppBar(
                 title = "Título da Tela",
                 subtitle = "Subtitulo da Tela",
-                showMenuWithLogout = false
             )
         }
     }

@@ -6,7 +6,6 @@ import br.com.velhatech.components.fields.state.TextField
 import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.core.validation.FieldValidationError
-import br.com.velhatech.screen.registeruser.enums.EnumUserValidationTypes
 import br.com.velhatech.screen.registeruser.enums.EnumValidatedUserFields
 import br.com.velhatech.state.RegisterUserUIState
 import br.com.velhatech.usecase.SaveUserUseCase
@@ -44,7 +43,12 @@ class RegisterUserViewModel @Inject constructor(
                 name = initializeNameTextField(),
                 email = initializeEmailTextField(),
                 password = initializePasswordTextField(),
-                messageDialogState = initializeMessageDialogState()
+                messageDialogState = initializeMessageDialogState(),
+                onToggleLoading = {
+                    _uiState.value = _uiState.value.copy(
+                        showLoading = !_uiState.value.showLoading
+                    )
+                }
             )
         }
     }
@@ -108,20 +112,21 @@ class RegisterUserViewModel @Inject constructor(
         )
     }
     
-    fun saveUser(onSuccess: () -> Unit, onFailure: () -> Unit) {
+    fun saveUser(onSuccess: () -> Unit, onComplete: () -> Unit) {
         launch {
             val validationResults = saveUserUseCase(_uiState.value.user)
 
             if (validationResults.isEmpty()) {
                 onSuccess()
             } else {
-                onFailure()
                 showValidationMessages(validationResults)
             }
+
+            onComplete()
         }
     }
 
-    private fun showValidationMessages(validationResults: List<FieldValidationError<EnumValidatedUserFields, EnumUserValidationTypes>>) {
+    private fun showValidationMessages(validationResults: List<FieldValidationError<EnumValidatedUserFields>>) {
         validationResults.forEach {
             when (it.field) {
                 EnumValidatedUserFields.NAME -> {

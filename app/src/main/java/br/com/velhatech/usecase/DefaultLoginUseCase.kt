@@ -4,7 +4,6 @@ import android.content.Context
 import br.com.velhatech.R
 import br.com.velhatech.repository.UserRepository
 import br.com.velhatech.core.validation.FieldValidationError
-import br.com.velhatech.screen.login.enums.EnumLoginValidationTypes
 import br.com.velhatech.screen.login.enums.EnumValidatedLoginFields
 import br.com.velhatech.screen.login.enums.EnumValidatedLoginFields.*
 
@@ -13,7 +12,7 @@ class DefaultLoginUseCase(
     private val userRepository: UserRepository
 ) {
 
-    suspend operator fun invoke(email: String?, password: String?): List<FieldValidationError<EnumValidatedLoginFields, EnumLoginValidationTypes>> {
+    suspend operator fun invoke(email: String?, password: String?): List<FieldValidationError<EnumValidatedLoginFields>> {
         val validationsResults = mutableListOf(
             validateEmail(email),
             validatePassword(password),
@@ -30,7 +29,7 @@ class DefaultLoginUseCase(
         return validationsResults
     }
 
-    private fun validatePassword(password: String?): FieldValidationError<EnumValidatedLoginFields, EnumLoginValidationTypes>? {
+    private fun validatePassword(password: String?): FieldValidationError<EnumValidatedLoginFields>? {
         return when {
             password?.trim().isNullOrEmpty() -> {
                 val message = context.getString(
@@ -41,7 +40,6 @@ class DefaultLoginUseCase(
                 FieldValidationError(
                     field = PASSWORD,
                     message = message,
-                    validationType = EnumLoginValidationTypes.REQUIRED_PASSWORD
                 )
             }
 
@@ -49,7 +47,7 @@ class DefaultLoginUseCase(
         }
     }
 
-    private fun validateEmail(email: String?): FieldValidationError<EnumValidatedLoginFields, EnumLoginValidationTypes>? {
+    private fun validateEmail(email: String?): FieldValidationError<EnumValidatedLoginFields>? {
         return when {
             email?.trim().isNullOrEmpty() -> {
                 val message = context.getString(
@@ -60,7 +58,6 @@ class DefaultLoginUseCase(
                 FieldValidationError(
                     field = EMAIL,
                     message = message,
-                    validationType = EnumLoginValidationTypes.REQUIRED_EMAIL
                 )
             }
 
@@ -71,7 +68,7 @@ class DefaultLoginUseCase(
     private fun validateUserCredentials(
         email: String?,
         password: String?
-    ): FieldValidationError<EnumValidatedLoginFields, EnumLoginValidationTypes>? {
+    ): FieldValidationError<EnumValidatedLoginFields>? {
         val emailTrimmed = email?.trim()
         val passwordTrimmed = password?.trim()
 
@@ -86,7 +83,6 @@ class DefaultLoginUseCase(
                 FieldValidationError(
                     field = null,
                     message = context.getString(R.string.validation_msg_invalid_credetials_login),
-                    validationType = EnumLoginValidationTypes.INVALID_CREDENTIALS
                 )
             }
 

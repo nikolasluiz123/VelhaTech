@@ -13,12 +13,14 @@ import br.com.velhatech.viewmodel.RoomListViewModel
 const val roomListScreenRoute = "roomList"
 
 fun NavGraphBuilder.roomListScreen(
+    onNavigateToRoomCreation: () -> Unit
 ) {
     composable(route = roomListScreenRoute) {
         val loginViewModel = hiltViewModel<RoomListViewModel>()
 
         RoomListScreen(
             viewModel = loginViewModel,
+            onNavigateToRoomCreation = onNavigateToRoomCreation
         )
     }
 }

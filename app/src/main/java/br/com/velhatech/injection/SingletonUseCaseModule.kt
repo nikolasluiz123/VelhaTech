@@ -1,9 +1,11 @@
 package br.com.velhatech.injection
 
 import android.content.Context
+import br.com.velhatech.repository.RoomRepository
 import br.com.velhatech.repository.UserRepository
 import br.com.velhatech.usecase.DefaultLoginUseCase
 import br.com.velhatech.usecase.GoogleLoginUseCase
+import br.com.velhatech.usecase.SaveRoomUseCase
 import br.com.velhatech.usecase.SaveUserUseCase
 import dagger.Module
 import dagger.Provides
@@ -48,4 +50,14 @@ class SingletonUseCaseModule {
         )
     }
 
+    @Provides
+    fun provideSaveRoomUseCase(
+        @ApplicationContext context: Context,
+        roomRepository: RoomRepository
+    ): SaveRoomUseCase {
+        return SaveRoomUseCase(
+            context = context,
+            roomRepository = roomRepository
+        )
+    }
 }

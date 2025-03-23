@@ -1,4 +1,4 @@
-package br.com.velhatech.firebase.data.access.repository
+package br.com.velhatech.repository
 
 import br.com.velhatech.firebase.data.access.service.FirestoreRoomService
 import br.com.velhatech.firebase.enums.EnumDifficultLevel

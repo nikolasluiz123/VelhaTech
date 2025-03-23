@@ -5,7 +5,7 @@ import br.com.velhatech.R
 import br.com.velhatech.components.filter.SimpleFilterState
 import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
-import br.com.velhatech.firebase.data.access.repository.RoomRepository
+import br.com.velhatech.repository.RoomRepository
 import br.com.velhatech.state.RoomListUIState
 import br.com.velhatech.viewmodel.common.VelhaTechViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

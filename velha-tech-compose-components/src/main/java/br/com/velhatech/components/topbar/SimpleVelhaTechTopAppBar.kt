@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import br.com.velhatech.core.theme.TopAppBarSubtitleTextStyle
 import br.com.velhatech.core.theme.TopAppBarTitleTextStyle
 
@@ -15,7 +14,7 @@ import br.com.velhatech.core.theme.TopAppBarTitleTextStyle
  * Top App Bar com uma passagem facilitada de título e
  * subtítulo.
  *
- * @see FitnessProTopAppBar
+ * @see VelhaTechTopAppBar
  *
  * @param title String com o título da barra
  * @param subtitle String com o subtítulo da barra
@@ -46,10 +45,9 @@ fun SimpleVelhaTechTopAppBar(
     ),
     showNavigationIcon: Boolean = true,
     customNavigationIcon: (@Composable () -> Unit)? = null,
-    showMenuWithLogout: Boolean = true,
     showMenu: Boolean = false
 ) {
-    FitnessProTopAppBar(
+    VelhaTechTopAppBar(
         title = {
             Column {
                 Text(
@@ -72,7 +70,6 @@ fun SimpleVelhaTechTopAppBar(
         customNavigationIcon = customNavigationIcon,
         onBackClick = onBackClick,
         onLogoutClick = onLogoutClick,
-        showMenuWithLogout = showMenuWithLogout,
         showMenu = showMenu
     )
 }

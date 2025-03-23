@@ -27,4 +27,14 @@
     <string name="room_list_item_label_difficult_level">Dificuldade</string>
     <string name="room_list_item_label_players">Jogadores</string>
     <string name="room_list_screen_empty_message">Não foram encontradas salas criadas, você pode criar a sua própria</string>
+    <string name="room_screen_title">Nova Sala</string>
+    <string name="room_screen_label_room_name">Nome da Sala *</string>
+    <string name="room_screen_label_password">Senha</string>
+    <string name="room_screen_label_rounds">Quantidade de Rodadas</string>
+    <string name="room_screen_label_difficult_level">Dificuldade</string>
+    <string name="label_room_name">Nome da Sala</string>
+    <string name="label_room_password">Senha</string>
+    <string name="label_rounds_count">Quantidade de Rodadas</string>
+    <string name="label_difficulty_level">Dificuldade</string>
+    <string name="room_screen_success_message">Sala salva com sucesso</string>
 </resources>

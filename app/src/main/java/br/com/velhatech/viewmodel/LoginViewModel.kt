@@ -2,9 +2,10 @@ package br.com.velhatech.viewmodel
 
 import android.content.Context
 import br.com.velhatech.R
+import br.com.velhatech.components.fields.state.TextField
 import br.com.velhatech.core.callback.showErrorDialog
+import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.core.validation.FieldValidationError
-import br.com.velhatech.screen.login.enums.EnumLoginValidationTypes
 import br.com.velhatech.screen.login.enums.EnumValidatedLoginFields
 import br.com.velhatech.state.LoginUIState
 import br.com.velhatech.usecase.DefaultLoginUseCase
@@ -16,6 +17,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -27,6 +29,10 @@ class LoginViewModel @Inject constructor(
     private val _uiState: MutableStateFlow<LoginUIState> = MutableStateFlow(LoginUIState())
     val uiState get() = _uiState.asStateFlow()
 
+    init {
+        initialLoadUIState()
+    }
+
     override fun onShowError(throwable: Throwable) {
         val message = when (throwable) {
             is FirebaseAuthInvalidCredentialsException -> context.getString(R.string.validation_msg_invalid_credetials_login)
@@ -34,6 +40,61 @@ class LoginViewModel @Inject constructor(
         }
 
         _uiState.value.messageDialogState.onShowDialog?.showErrorDialog(message = message)
+    }
+
+    private fun initialLoadUIState() {
+        _uiState.update { currentState ->
+            currentState.copy(
+                email = initializeEmailTextField(),
+                password = initializePasswordTextField(),
+                messageDialogState = initializeMessageDialogState()
+            )
+        }
+    }
+
+    private fun initializeEmailTextField(): TextField {
+        return TextField(onChange = {
+            _uiState.value = _uiState.value.copy(
+                email = _uiState.value.email.copy(
+                    value = it,
+                    errorMessage = ""
+                ),
+            )
+        })
+    }
+
+    private fun initializePasswordTextField(): TextField {
+        return TextField(onChange = {
+            _uiState.value = _uiState.value.copy(
+                password = _uiState.value.password.copy(
+                    value = it,
+                    errorMessage = ""
+                ),
+            )
+        })
+    }
+
+    private fun initializeMessageDialogState(): MessageDialogState {
+        return MessageDialogState(
+            onShowDialog = { type, message, onConfirm, onCancel ->
+                _uiState.value = _uiState.value.copy(
+                    messageDialogState = _uiState.value.messageDialogState.copy(
+                        dialogType = type,
+                        dialogMessage = message,
+                        showDialog = true,
+                        onConfirm = onConfirm,
+                        onCancel = onCancel
+                    )
+                )
+            },
+            onHideDialog = {
+                _uiState.value = _uiState.value.copy(
+                    messageDialogState = _uiState.value.messageDialogState.copy(
+                        showDialog = false
+                    )
+                )
+            }
+        )
     }
 
     fun onLoginClick(onSuccess: () -> Unit, onFailure: () -> Unit) {
@@ -52,7 +113,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun showValidationMessages(validationsResult: List<FieldValidationError<EnumValidatedLoginFields, EnumLoginValidationTypes>>) {
+    private fun showValidationMessages(validationsResult: List<FieldValidationError<EnumValidatedLoginFields>>) {
         val dialogValidations = validationsResult.firstOrNull { it.field == null }
 
         if (dialogValidations != null) {

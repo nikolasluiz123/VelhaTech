@@ -1,5 +1,6 @@
 package br.com.velhatech.screen.roomlist
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,11 +30,15 @@ import br.com.velhatech.state.RoomListUIState
 import br.com.velhatech.viewmodel.RoomListViewModel
 
 @Composable
-fun RoomListScreen(viewModel: RoomListViewModel) {
+fun RoomListScreen(
+    viewModel: RoomListViewModel,
+    onNavigateToRoomCreation: () -> Unit
+) {
     val state by viewModel.uiState.collectAsState()
 
     RoomListScreen(
-        state = state
+        state = state,
+        onNavigateToRoomCreation = onNavigateToRoomCreation
     )
 }
 
@@ -41,17 +46,17 @@ fun RoomListScreen(viewModel: RoomListViewModel) {
 @Composable
 fun RoomListScreen(
     state: RoomListUIState = RoomListUIState(),
+    onNavigateToRoomCreation: () -> Unit = { }
 ) {
     Scaffold(
         topBar = {
             SimpleVelhaTechTopAppBar(
                 title = stringResource(R.string.room_list_screen_title),
                 subtitle = state.subtitle,
-                showMenuWithLogout = false,
                 customNavigationIcon = {
                     IconButtonAccount(
                         onClick = {
-
+                            // TODO - Perfil
                         }
                     )
                 }
@@ -69,13 +74,12 @@ fun RoomListScreen(
                 floatingActionButton = {
                     FloatingActionButtonAdd(
                         isBottomBar = true,
-                        onClick = {
-
-                        }
+                        onClick = onNavigateToRoomCreation
                     )
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets(0.dp)
     ) { padding ->
         ConstraintLayout(
             Modifier

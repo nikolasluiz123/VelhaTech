@@ -24,5 +24,13 @@ fun VelhaTechNavHost(
         registerUserScreen(
             onBackClick = navController::popBackStack
         )
+
+        roomListScreen(
+            onNavigateToRoomCreation = navController::navigateToRoomScreen
+        )
+
+        roomScreen(
+            onBackClick = navController::popBackStack
+        )
     }
 }

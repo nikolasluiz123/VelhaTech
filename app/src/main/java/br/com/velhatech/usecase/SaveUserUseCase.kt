@@ -2,21 +2,20 @@ package br.com.velhatech.usecase
 
 import android.content.Context
 import androidx.core.util.PatternsCompat.EMAIL_ADDRESS
-import br.com.velhatech.repository.UserRepository
 import br.com.velhatech.core.validation.FieldValidationError
 import br.com.velhatech.firebase.auth.user.User
-import br.com.velhatech.screen.registeruser.enums.EnumUserValidationTypes
-import br.com.velhatech.screen.registeruser.enums.EnumUserValidationTypes.*
+import br.com.velhatech.repository.UserRepository
 import br.com.velhatech.screen.registeruser.enums.EnumValidatedUserFields
-import br.com.velhatech.screen.registeruser.enums.EnumValidatedUserFields.*
+import br.com.velhatech.screen.registeruser.enums.EnumValidatedUserFields.EMAIL
+import br.com.velhatech.screen.registeruser.enums.EnumValidatedUserFields.PASSWORD
 
 class SaveUserUseCase(
     private val context: Context,
     private val userRepository: UserRepository
 ) {
     
-    suspend operator fun invoke(user: User): List<FieldValidationError<EnumValidatedUserFields, EnumUserValidationTypes>> {
-        val validationResults = mutableListOf<FieldValidationError<EnumValidatedUserFields, EnumUserValidationTypes>>()
+    suspend operator fun invoke(user: User): List<FieldValidationError<EnumValidatedUserFields>> {
+        val validationResults = mutableListOf<FieldValidationError<EnumValidatedUserFields>>()
         validationResults.addAll(validateUser(user))
 
         if (validationResults.isEmpty()) {
@@ -26,7 +25,7 @@ class SaveUserUseCase(
         return validationResults
     }
 
-    private fun validateUser(user: User): MutableList<FieldValidationError<EnumValidatedUserFields, EnumUserValidationTypes>> {
+    private fun validateUser(user: User): MutableList<FieldValidationError<EnumValidatedUserFields>> {
         val validationResults = mutableListOf(
             validateUserEmail(user),
             validateUserPassword(user)
@@ -35,7 +34,7 @@ class SaveUserUseCase(
         return validationResults.filterNotNull().toMutableList()
     }
 
-    private fun validateUserEmail(user: User): FieldValidationError<EnumValidatedUserFields, EnumUserValidationTypes>? {
+    private fun validateUserEmail(user: User): FieldValidationError<EnumValidatedUserFields>? {
         val email = user.email?.trim()
 
         val validationPair = when {
@@ -48,7 +47,6 @@ class SaveUserUseCase(
                 FieldValidationError(
                     field = EMAIL,
                     message = message,
-                    validationType = REQUIRED_USER_EMAIL
                 )
             }
 
@@ -62,7 +60,6 @@ class SaveUserUseCase(
                 FieldValidationError(
                     field = EMAIL,
                     message = message,
-                    validationType = MAX_LENGTH_USER_EMAIL
                 )
             }
 
@@ -75,7 +72,6 @@ class SaveUserUseCase(
                 FieldValidationError(
                     field = EMAIL,
                     message = message,
-                    validationType = INVALID_USER_EMAIL
                 )
             }
 
@@ -89,7 +85,7 @@ class SaveUserUseCase(
         return validationPair
     }
 
-    private fun validateUserPassword(user: User): FieldValidationError<EnumValidatedUserFields, EnumUserValidationTypes>? {
+    private fun validateUserPassword(user: User): FieldValidationError<EnumValidatedUserFields>? {
         val password = user.password?.trim()
 
         val validationPair = when {
@@ -102,7 +98,6 @@ class SaveUserUseCase(
                 FieldValidationError(
                     field = PASSWORD,
                     message = message,
-                    validationType = REQUIRED_USER_PASSWORD
                 )
             }
 
@@ -116,7 +111,6 @@ class SaveUserUseCase(
                 FieldValidationError(
                     field = PASSWORD,
                     message = message,
-                    validationType = MAX_LENGTH_USER_PASSWORD
                 )
             }
 

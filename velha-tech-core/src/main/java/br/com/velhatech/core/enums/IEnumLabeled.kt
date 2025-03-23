@@ -1,8 +1,8 @@
-package br.com.velhatech.firebase.enums
+package br.com.velhatech.core.enums
 
 import android.content.Context
 
-interface IEnumDomain {
+interface IEnumLabeled {
     fun  getLabel(context: Context): String? = null
 
     fun getPluralLabel(context: Context, quantity: Int): String? = null

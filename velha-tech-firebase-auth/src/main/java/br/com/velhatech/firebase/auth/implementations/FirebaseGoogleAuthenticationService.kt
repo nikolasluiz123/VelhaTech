@@ -28,9 +28,9 @@ class FirebaseGoogleAuthenticationService(private val context: Context): CommonF
             val firebaseCredential = GoogleAuthProvider.getCredential(token.idToken, null)
 
             Firebase.auth.signInWithCredential(firebaseCredential).await()
+        } else {
+            null
         }
-
-        null
     }
 
     private suspend fun getGoogleCredential(): Credential? {
