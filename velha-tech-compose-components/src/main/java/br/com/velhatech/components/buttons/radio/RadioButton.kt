@@ -33,23 +33,11 @@ fun <T: IEnumLabeled> RadioButtonSession(
             field.options.forEach { radioOption ->
                 LabeledRadioButton(
                     label = radioOption.value.getLabel(LocalContext.current)!!,
-                    selected = radioOption.checked,
-                    onClick = {
-                        checkOption(field, radioOption)
-                        field.onOptionSelected(radioOption)
-                    }
+                    selected = radioOption.value == field.selectedOption?.value,
+                    onClick = { field.onOptionSelected(radioOption) }
                 )
             }
         }
-    }
-}
-
-private fun <T: IEnumLabeled> checkOption(
-    field: RadioButtonField<T>,
-    radioOption: RadioButtonOption<T>
-) {
-    field.options.forEach {
-        it.checked = it.value == radioOption.value
     }
 }
 

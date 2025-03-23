@@ -104,6 +104,9 @@ class RoomViewModel @Inject constructor(
                 Firebase.analytics.logRadioButtonClick(ROOM_SCREEN_ROUND_RADIO_BUTTON, it.value)
 
                 _uiState.value = _uiState.value.copy(
+                    rounds = _uiState.value.rounds.copy(
+                        selectedOption = it
+                    ),
                     toRoom = _uiState.value.toRoom.copy(
                         roundsCount = getRoundsCountFrom(it)
                     )
@@ -126,6 +129,9 @@ class RoomViewModel @Inject constructor(
                 Firebase.analytics.logRadioButtonClick(ROOM_SCREEN_DIFFICULT_LEVEL_RADIO_BUTTON, it.value)
 
                 _uiState.value = _uiState.value.copy(
+                    difficultLevel = _uiState.value.difficultLevel.copy(
+                        selectedOption = it
+                    ),
                     toRoom = _uiState.value.toRoom.copy(
                         difficultLevel = it.value
                     )
