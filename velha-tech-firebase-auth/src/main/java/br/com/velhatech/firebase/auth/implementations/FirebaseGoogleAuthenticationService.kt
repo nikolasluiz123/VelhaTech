@@ -6,7 +6,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
-import br.com.velhatech.firebase.auth.R
+import br.com.velhatech.firebase.auth.BuildConfig
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
@@ -34,8 +34,10 @@ class FirebaseGoogleAuthenticationService(private val context: Context): CommonF
     }
 
     private suspend fun getGoogleCredential(): Credential? {
+        val apiKey = BuildConfig.FIREBASE_WEB_API_KEY
+
         val signInWithGoogleOption = GetSignInWithGoogleOption
-            .Builder(serverClientId = context.getString(R.string.default_web_client_id))
+            .Builder(serverClientId = apiKey)
             .build()
 
         val request = GetCredentialRequest.Builder()
