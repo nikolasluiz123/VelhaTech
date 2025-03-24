@@ -23,6 +23,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            buildConfigField("String", "FIREBASE_WEB_API_KEY", "\"\${FIREBASE_WEB_API_KEY}\"")
+        }
+
+        debug {
+            buildConfigField("String", "FIREBASE_WEB_API_KEY", "\"\${FIREBASE_WEB_API_KEY}\"")
         }
     }
     compileOptions {
@@ -31,6 +37,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "21"
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
