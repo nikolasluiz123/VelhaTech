@@ -9,7 +9,8 @@ data class RoomDocument(
     val maxPlayers: Int = 2,
     val playersCount: Int = 1,
     val difficultLevel: String? = null,
-    val password: String? = null
+    val password: String? = null,
+    var creationDate: Long? = null
 ) {
 
     companion object {
