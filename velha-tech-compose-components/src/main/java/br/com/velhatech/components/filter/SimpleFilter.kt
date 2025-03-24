@@ -64,6 +64,7 @@ fun SimpleFilter(
                 query = text,
                 onQueryChange = {
                     text = it
+                    state.filterValue = it
                     state.onSimpleFilterChange(text)
                 },
                 onSearch = {

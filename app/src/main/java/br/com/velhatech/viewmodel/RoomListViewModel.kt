@@ -7,6 +7,7 @@ import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.firebase.apis.analytics.logSimpleFilterClick
 import br.com.velhatech.firebase.auth.implementations.CommonFirebaseAuthenticationService
+import br.com.velhatech.firebase.to.TORoom
 import br.com.velhatech.repository.RoomRepository
 import br.com.velhatech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velhatech.state.RoomListUIState
@@ -47,8 +48,10 @@ class RoomListViewModel @Inject constructor(
 
     private fun initializeSimpleFilterState(): SimpleFilterState {
         return SimpleFilterState(
-            onSimpleFilterChange = {
-                // TODO - Pensar no filtro depois
+            onSimpleFilterChange = { filterValue ->
+                val result = applyFilterToRooms(filterValue, _uiState.value.rooms)
+
+                _uiState.value = _uiState.value.copy(filteredRooms = result)
             },
             onExpandedChange = {
                 Firebase.analytics.logSimpleFilterClick(EnumRoomListTags.ROOM_LIST_SCREEN_FILTER)
@@ -58,6 +61,16 @@ class RoomListViewModel @Inject constructor(
                 )
             }
         )
+    }
+
+    private fun applyFilterToRooms(filterValue: String, rooms: List<TORoom>): List<TORoom> {
+        return if (filterValue.isEmpty()) {
+            rooms
+        } else {
+            rooms.filter {
+                it.roomName!!.contains(filterValue, ignoreCase = true)
+            }
+        }
     }
 
     private fun initializeMessageDialogState(): MessageDialogState {
@@ -84,17 +97,18 @@ class RoomListViewModel @Inject constructor(
     }
 
     private fun addRoomListListener() {
-        launch {
-            roomRepository.addRoomListListener(
-                onSuccess = { chats ->
-                    _uiState.value = _uiState.value.copy(rooms = chats)
-                },
-                onError = { exception ->
-                    onShowError(exception)
-                    onError(exception)
-                }
-            )
-        }
+        roomRepository.addRoomListListener(
+            onSuccess = { rooms ->
+                _uiState.value = _uiState.value.copy(
+                    rooms = rooms,
+                    filteredRooms = applyFilterToRooms(_uiState.value.simpleFilterState.filterValue, rooms)
+                )
+            },
+            onError = { exception ->
+                onShowError(exception)
+                onError(exception)
+            }
+        )
     }
 
     override fun onShowError(throwable: Throwable) {

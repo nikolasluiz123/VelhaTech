@@ -139,7 +139,7 @@ private fun RoomLazyVerticalList(
 ) {
     LazyVerticalList(
         modifier = modifier,
-        items = state.rooms,
+        items = state.filteredRooms,
         emptyMessageResId = R.string.room_list_screen_empty_message,
     ) { toRoom ->
         RoomListItem(
