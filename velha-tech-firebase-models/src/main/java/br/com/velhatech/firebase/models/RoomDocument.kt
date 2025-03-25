@@ -7,7 +7,7 @@ data class RoomDocument(
     val roomName: String? = null,
     val roundsCount: Int? = null,
     val maxPlayers: Int = 2,
-    val playersCount: Int = 1,
+    val players: MutableList<PlayerDocument> = mutableListOf(),
     val difficultLevel: String? = null,
     val password: String? = null,
     var creationDate: Long? = null

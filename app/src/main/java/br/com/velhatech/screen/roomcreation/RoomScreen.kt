@@ -36,7 +36,9 @@ import br.com.velhatech.core.keyboard.NormalTextKeyboardOptions
 import br.com.velhatech.core.keyboard.PasswordKeyboardOptions
 import br.com.velhatech.core.theme.SnackBarTextStyle
 import br.com.velhatech.core.theme.VelhaTechTheme
+import br.com.velhatech.navigation.GameScreenArgs
 import br.com.velhatech.screen.common.callback.OnSaveLessFailureCallback
+import br.com.velhatech.screen.game.callback.OnNavigateToGame
 import br.com.velhatech.state.RoomUIState
 import br.com.velhatech.viewmodel.RoomViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -46,14 +48,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun RoomScreen(
     viewModel: RoomViewModel,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNavigateToGame: OnNavigateToGame
 ) {
     val state by viewModel.uiState.collectAsState()
 
     RoomScreen(
         state = state,
         onBackClick = onBackClick,
-        onSave = viewModel::saveRoom
+        onSave = viewModel::saveRoom,
+        onNavigateToGame = onNavigateToGame
     )
 }
 
@@ -62,7 +66,8 @@ fun RoomScreen(
 fun RoomScreen(
     state: RoomUIState = RoomUIState(),
     onBackClick: () -> Unit = { },
-    onSave: OnSaveLessFailureCallback? = null
+    onSave: OnSaveLessFailureCallback? = null,
+    onNavigateToGame: OnNavigateToGame? = null
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -83,6 +88,7 @@ fun RoomScreen(
                     onSave?.onExecute(
                         onSuccess = {
                             showSaveSuccessMessage(coroutineScope, snackbarHostState, context)
+                            onNavigateToGame?.onExecute(GameScreenArgs(state.toRoom.id!!))
                         },
                         onCompleted = {
                             state.onToggleLoading()

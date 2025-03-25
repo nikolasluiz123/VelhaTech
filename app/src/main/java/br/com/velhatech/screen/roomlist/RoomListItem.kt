@@ -1,5 +1,6 @@
 package br.com.velhatech.screen.roomlist
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -18,18 +19,24 @@ import androidx.constraintlayout.compose.Dimension
 import br.com.velhatech.R
 import br.com.velhatech.components.LabeledText
 import br.com.velhatech.core.theme.VelhaTechTheme
-import br.com.velhatech.firebase.models.RoomDocument
 import br.com.velhatech.firebase.enums.EnumDifficultLevel
+import br.com.velhatech.firebase.to.TOPlayer
 import br.com.velhatech.firebase.to.TORoom
+import br.com.velhatech.navigation.GameScreenArgs
+import br.com.velhatech.screen.game.callback.OnNavigateToGame
 
 @Composable
-fun RoomListItem(room: TORoom) {
+fun RoomListItem(
+    room: TORoom,
+    onNavigateToGame: OnNavigateToGame? = null
+) {
     val context = LocalContext.current
 
     ConstraintLayout(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable { onNavigateToGame?.onExecute(GameScreenArgs(room.id!!)) }
     ) {
         val (roomNameRef, roundsRef, playersRef, difficultLevelRef, authIconRef, dividerRef) = createRefs()
 
@@ -70,8 +77,8 @@ fun RoomListItem(room: TORoom) {
             label = stringResource(R.string.room_list_item_label_players),
             value = stringResource(
                 R.string.room_list_item_players_value,
-                room.playersCount!!,
-                room.maxPlayers!!
+                room.players.size,
+                room.maxPlayers
             )
         )
 
@@ -139,7 +146,7 @@ private fun RoomListItemPreviewDark() {
                     roomName = "Sala da Loucura",
                     roundsCount = 5,
                     maxPlayers = 2,
-                    playersCount = 1,
+                    players = arrayListOf(TOPlayer("1", "player 1")),
                     difficultLevel = EnumDifficultLevel.EASY
                 )
             )
@@ -157,7 +164,7 @@ private fun RoomListItemPreviewLight() {
                     roomName = "Sala da Loucura",
                     roundsCount = 5,
                     maxPlayers = 2,
-                    playersCount = 1,
+                    players = arrayListOf(TOPlayer("1", "player 1")),
                     difficultLevel = EnumDifficultLevel.EASY
                 )
             )

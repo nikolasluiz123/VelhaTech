@@ -27,6 +27,7 @@ import br.com.velhatech.components.topbar.SimpleVelhaTechTopAppBar
 import br.com.velhatech.core.extensions.calculatePaddingTopWithoutMargin
 import br.com.velhatech.core.theme.VelhaTechTheme
 import br.com.velhatech.firebase.apis.analytics.logButtonClick
+import br.com.velhatech.screen.game.callback.OnNavigateToGame
 import br.com.velhatech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velhatech.state.RoomListUIState
 import br.com.velhatech.viewmodel.RoomListViewModel
@@ -36,13 +37,15 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun RoomListScreen(
     viewModel: RoomListViewModel,
-    onNavigateToRoomCreation: () -> Unit
+    onNavigateToRoomCreation: () -> Unit,
+    onNavigateToGame: OnNavigateToGame
 ) {
     val state by viewModel.uiState.collectAsState()
 
     RoomListScreen(
         state = state,
-        onNavigateToRoomCreation = onNavigateToRoomCreation
+        onNavigateToRoomCreation = onNavigateToRoomCreation,
+        onNavigateToGame = onNavigateToGame
     )
 }
 
@@ -50,7 +53,8 @@ fun RoomListScreen(
 @Composable
 fun RoomListScreen(
     state: RoomListUIState = RoomListUIState(),
-    onNavigateToRoomCreation: () -> Unit = { }
+    onNavigateToRoomCreation: () -> Unit = { },
+    onNavigateToGame: OnNavigateToGame? = null
 ) {
     Scaffold(
         topBar = {
@@ -114,7 +118,10 @@ fun RoomListScreen(
                 placeholderResId = R.string.room_list_screen_filter_placeholder,
                 state = state.simpleFilterState
             ) {
-                RoomLazyVerticalList(state = state)
+                RoomLazyVerticalList(
+                    state = state,
+                    onNavigateToGame = onNavigateToGame
+                )
             }
 
             RoomLazyVerticalList(
@@ -126,7 +133,8 @@ fun RoomListScreen(
 
                     height = Dimension.fillToConstraints
                 },
-                state = state
+                state = state,
+                onNavigateToGame = onNavigateToGame
             )
         }
     }
@@ -135,7 +143,8 @@ fun RoomListScreen(
 @Composable
 private fun RoomLazyVerticalList(
     state: RoomListUIState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToGame: OnNavigateToGame?
 ) {
     LazyVerticalList(
         modifier = modifier,
@@ -143,7 +152,8 @@ private fun RoomLazyVerticalList(
         emptyMessageResId = R.string.room_list_screen_empty_message,
     ) { toRoom ->
         RoomListItem(
-            room = toRoom
+            room = toRoom,
+            onNavigateToGame = onNavigateToGame
         )
     }
 }

@@ -13,6 +13,7 @@ open class CommonFirebaseAuthenticationService {
     fun getAuthenticatedUser(): User? {
         return Firebase.auth.currentUser?.let { firebaseUser ->
             User(
+                id = firebaseUser.uid,
                 name = firebaseUser.displayName,
                 email = firebaseUser.email,
             )

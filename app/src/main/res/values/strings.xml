@@ -38,4 +38,13 @@
     <string name="label_difficulty_level">Dificuldade</string>
     <string name="room_screen_success_message">Sala salva com sucesso</string>
     <string name="splash_screen_ic_launcher_description">App Logo</string>
+    <string name="game_screen_pause_icon_description">Pausar o jogo</string>
+    <string name="game_screen_play_icon_description">Iniciar o jogo</string>
+    <string name="game_screen_rounds_list_label_actual_round">Rodada Atual: %1$s/%2$s</string>
+    <string name="game_screen_rounds_list_label_collapse">Retrair a lista de rodadas</string>
+    <string name="game_screen_rounds_list_label_expand">Expandir a lista de rodadas</string>
+    <string name="game_screen_rounds_list_label_draw">Empate</string>
+    <string name="game_screen_rounds_list_label_winner">Vencedor: %1$s</string>
+    <string name="game_screen_rounds_list_label_round">Rodada %1$s</string>
+    <string name="game_screen_room_exit_confirm_message">Você tem certeza que deseja sair da sala?</string>
 </resources>

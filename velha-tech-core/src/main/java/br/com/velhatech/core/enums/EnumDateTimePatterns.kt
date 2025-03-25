@@ -12,6 +12,8 @@ enum class EnumDateTimePatterns(val pattern: String) {
 
     TIME_ONLY_NUMBERS("HHmm"),
 
+    TIME_WITH_SECONDS("HH:mm:ss"),
+
     DATE_TIME("dd/MM/yyyy HH:mm"),
 
     DATE_TIME_SHORT("dd/MM/yy HH:mm"),

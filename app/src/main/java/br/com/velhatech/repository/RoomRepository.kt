@@ -2,7 +2,9 @@ package br.com.velhatech.repository
 
 import br.com.velhatech.firebase.data.access.service.FirestoreRoomService
 import br.com.velhatech.firebase.enums.EnumDifficultLevel
+import br.com.velhatech.firebase.models.PlayerDocument
 import br.com.velhatech.firebase.models.RoomDocument
+import br.com.velhatech.firebase.to.TOPlayer
 import br.com.velhatech.firebase.to.TORoom
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -12,7 +14,10 @@ class RoomRepository(
     private var roomListListener: ListenerRegistration? = null
 
     suspend fun saveRoom(toRoom: TORoom) {
-        firestoreRoomService.saveRoom(toRoom.toRoomDocument())
+        val room = toRoom.toRoomDocument()
+        toRoom.id = room.id
+
+        firestoreRoomService.saveRoom(room)
     }
 
     fun addRoomListListener(
@@ -28,8 +33,20 @@ class RoomRepository(
         )
     }
 
+    suspend fun findRoomById(roomId: String): TORoom? {
+        return firestoreRoomService.findRoomById(roomId)?.toTORoom()
+    }
+
     fun removeRoomListListener() {
         roomListListener?.remove()
+    }
+
+    suspend fun addAuthenticatedPlayerToRoom(roomId: String) {
+        firestoreRoomService.addAuthenticatedPlayerToRoom(roomId)
+    }
+
+    suspend fun removePlayerFromRoom(roomId: String) {
+        firestoreRoomService.removeAuthenticatedPlayerFromRoom(roomId)
     }
 }
 
@@ -38,7 +55,7 @@ fun TORoom.toRoomDocument(): RoomDocument {
         roomName = roomName,
         roundsCount = roundsCount,
         maxPlayers = maxPlayers,
-        playersCount = playersCount,
+        players = players.map { it.toPlayerDocument() }.toMutableList(),
         difficultLevel = difficultLevel?.name,
         password = password
     )
@@ -54,8 +71,22 @@ fun RoomDocument.toTORoom(): TORoom {
         roomName = roomName,
         roundsCount = roundsCount,
         maxPlayers = maxPlayers,
-        playersCount = playersCount,
+        players = players.map { it.toTOPlayer() }.toMutableList(),
         difficultLevel = EnumDifficultLevel.valueOf(difficultLevel!!),
         password = password,
+    )
+}
+
+fun PlayerDocument.toTOPlayer(): TOPlayer {
+    return TOPlayer(
+        userId = userId!!,
+        name = name!!
+    )
+}
+
+fun TOPlayer.toPlayerDocument(): PlayerDocument {
+    return PlayerDocument(
+        userId = userId,
+        name = name
     )
 }

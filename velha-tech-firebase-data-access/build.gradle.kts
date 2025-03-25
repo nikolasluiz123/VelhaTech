@@ -37,6 +37,7 @@ android {
 dependencies {
     implementation(project(":velha-tech-core"))
     implementation(project(":velha-tech-firebase-models"))
+    implementation(project(":velha-tech-firebase-auth"))
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

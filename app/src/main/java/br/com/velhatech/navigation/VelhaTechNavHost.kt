@@ -34,10 +34,16 @@ fun VelhaTechNavHost(
         )
 
         roomListScreen(
-            onNavigateToRoomCreation = navController::navigateToRoomScreen
+            onNavigateToRoomCreation = navController::navigateToRoomScreen,
+            onNavigateToGame = navController::navigateToGameScreen
         )
 
         roomScreen(
+            onBackClick = navController::popBackStack,
+            onNavigateToGame = navController::navigateToGameScreen
+        )
+
+        gameScreen(
             onBackClick = navController::popBackStack
         )
     }

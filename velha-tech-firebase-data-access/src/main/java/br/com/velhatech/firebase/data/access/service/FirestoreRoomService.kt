@@ -1,5 +1,7 @@
 package br.com.velhatech.firebase.data.access.service
 
+import br.com.velhatech.firebase.auth.implementations.CommonFirebaseAuthenticationService
+import br.com.velhatech.firebase.models.PlayerDocument
 import br.com.velhatech.firebase.models.RoomDocument
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -8,7 +10,9 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.jvm.java
 
-class FirestoreRoomService: FirestoreService() {
+class FirestoreRoomService(
+    private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService
+): FirestoreService() {
 
     suspend fun saveRoom(room: RoomDocument): Unit = withContext(IO) {
         val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(room.id)
@@ -42,5 +46,32 @@ class FirestoreRoomService: FirestoreService() {
                 onSuccess(chats)
             }
         }
+    }
+
+    suspend fun findRoomById(roomId: String): RoomDocument? = withContext(IO) {
+        val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+        roomDocumentRef.get().await().toObject(RoomDocument::class.java)
+    }
+
+    suspend fun removeAuthenticatedPlayerFromRoom(roomId: String) = withContext(IO) {
+        val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+        val roomDocument = roomDocumentRef.get().await().toObject(RoomDocument::class.java)!!
+        val user = commonFirebaseAuthenticationService.getAuthenticatedUser()!!
+
+        roomDocument.players.removeIf { it.userId == user.id }
+
+        roomDocumentRef.update(RoomDocument::players.name, roomDocument.players)
+    }
+
+    suspend fun addAuthenticatedPlayerToRoom(roomId: String) = withContext(IO) {
+        val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+        val roomDocument = roomDocumentRef.get().await().toObject(RoomDocument::class.java)!!
+        val user = commonFirebaseAuthenticationService.getAuthenticatedUser()!!
+
+        if (roomDocument.players.none { it.userId == user.id }) {
+            roomDocument.players.add(PlayerDocument(user.id!!, user.name!!))
+        }
+
+        roomDocumentRef.update(RoomDocument::players.name, roomDocument.players)
     }
 }
