@@ -50,4 +50,5 @@
     <string name="register_user_screen_weak_password_message">Sua senha precisa ter ao menos 6 caracteres.</string>
     <string name="register_user_screen_user_collision_message">Esse e-mail já está em uso.</string>
     <string name="game_screen_subtitle_two_players">%1$s vs %2$s</string>
+    <string name="room_list_screen_full_room_message">Essa sala já está cheia.</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,7 @@ import br.com.velha.tech.components.dialog.VelhaTechMessageDialog
 import br.com.velha.tech.components.filter.SimpleFilter
 import br.com.velha.tech.components.list.LazyVerticalList
 import br.com.velha.tech.components.topbar.SimpleVelhaTechTopAppBar
+import br.com.velha.tech.core.callback.showInformationDialog
 import br.com.velha.tech.core.extensions.calculatePaddingTopWithoutMargin
 import br.com.velha.tech.core.theme.VelhaTechTheme
 import br.com.velha.tech.firebase.apis.analytics.logButtonClick
@@ -34,7 +36,9 @@ import br.com.velha.tech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velha.tech.state.RoomListUIState
 import br.com.velha.tech.viewmodel.RoomListViewModel
 import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.lang.ProcessBuilder.Redirect.to
 
 @Composable
 fun RoomListScreen(
@@ -124,10 +128,10 @@ fun RoomListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(filterRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
                 placeholderResId = R.string.room_list_screen_filter_placeholder,
                 state = state.simpleFilterState
             ) {
@@ -159,6 +163,8 @@ private fun RoomLazyVerticalList(
     modifier: Modifier = Modifier,
     onNavigateToGame: OnNavigateToGame?
 ) {
+    val context = LocalContext.current
+
     LazyVerticalList(
         modifier = modifier,
         items = state.filteredRooms,
@@ -166,7 +172,13 @@ private fun RoomLazyVerticalList(
     ) { toRoom ->
         RoomListItem(
             room = toRoom,
-            onNavigateToGame = onNavigateToGame
+            onNavigateToGame = {
+                if (toRoom.playersCount == 2 && toRoom.players.none { it.userId == Firebase.auth.currentUser?.uid }) {
+                    state.messageDialogState.onShowDialog?.showInformationDialog(context.getString(R.string.room_list_screen_full_room_message))
+                } else {
+                    onNavigateToGame?.onExecute(it)
+                }
+            }
         )
     }
 }

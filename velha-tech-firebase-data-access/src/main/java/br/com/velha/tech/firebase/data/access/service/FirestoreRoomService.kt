@@ -33,7 +33,6 @@ class FirestoreRoomService(
     ): ListenerRegistration {
         val roomsQuery = db
             .collection(RoomDocument.COLLECTION_NAME)
-            .whereLessThan(RoomDocument::playersCount.name, 2)
             .orderBy(RoomDocument::creationDate.name, Query.Direction.DESCENDING)
 
         return roomsQuery.addSnapshotListener { value, error ->
