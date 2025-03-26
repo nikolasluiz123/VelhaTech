@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.velhatech.firebase.auth"
+    namespace = "br.com.velha.tech.firebase.auth"
     compileSdk = 35
 
     defaultConfig {

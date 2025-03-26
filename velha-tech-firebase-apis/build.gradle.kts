@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.velhatech.firebase.apis"
+    namespace = "br.com.velha.tech.firebase.apis"
     compileSdk = 35
 
     defaultConfig {

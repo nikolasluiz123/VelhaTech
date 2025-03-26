@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.velhatech.firebase.data.access"
+    namespace = "br.com.velha.tech.firebase.data.access"
     compileSdk = 35
 
     defaultConfig {

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.velhatech.core"
+    namespace = "br.com.velha.tech.core"
     compileSdk = 35
 
     defaultConfig {

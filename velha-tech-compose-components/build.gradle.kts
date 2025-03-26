@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "br.com.velhatech.compose.components"
+    namespace = "br.com.velha.tech.compose.components"
     compileSdk = 35
 
     defaultConfig {
