@@ -1,9 +1,17 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlinAndroidKsp)
     alias(libs.plugins.hiltAndroid)
 }
+
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
+val webClientId: String = localProperties.getProperty("WEB_CLIENT_ID", "\"default_value\"")
 
 android {
     namespace = "br.com.velha.tech.firebase.auth"
@@ -24,11 +32,11 @@ android {
                 "proguard-rules.pro"
             )
 
-            buildConfigField("String", "FIREBASE_WEB_API_KEY", "\"\${FIREBASE_WEB_API_KEY}\"")
+            buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
         }
 
         debug {
-            buildConfigField("String", "FIREBASE_WEB_API_KEY", "\"\${FIREBASE_WEB_API_KEY}\"")
+            buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
         }
     }
     compileOptions {

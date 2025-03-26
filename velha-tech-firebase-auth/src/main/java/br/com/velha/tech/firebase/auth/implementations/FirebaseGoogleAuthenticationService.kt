@@ -1,5 +1,6 @@
 package br.com.velha.tech.firebase.auth.implementations
 
+import android.R.attr.apiKey
 import android.content.Context
 import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
@@ -12,6 +13,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.R
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers.IO
@@ -34,10 +36,8 @@ class FirebaseGoogleAuthenticationService(private val context: Context): CommonF
     }
 
     private suspend fun getGoogleCredential(): Credential? {
-        val apiKey = BuildConfig.FIREBASE_WEB_API_KEY
-
         val signInWithGoogleOption = GetSignInWithGoogleOption
-            .Builder(serverClientId = apiKey)
+            .Builder(serverClientId = BuildConfig.WEB_CLIENT_ID)
             .build()
 
         val request = GetCredentialRequest.Builder()
