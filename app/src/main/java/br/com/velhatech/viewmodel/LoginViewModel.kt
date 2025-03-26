@@ -6,6 +6,7 @@ import br.com.velhatech.components.fields.state.TextField
 import br.com.velhatech.core.callback.showErrorDialog
 import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.core.validation.FieldValidationError
+import br.com.velhatech.firebase.auth.exception.EmailNotVerifiedException
 import br.com.velhatech.screen.login.enums.EnumValidatedLoginFields
 import br.com.velhatech.state.LoginUIState
 import br.com.velhatech.usecase.DefaultLoginUseCase
@@ -36,6 +37,7 @@ class LoginViewModel @Inject constructor(
     override fun onShowError(throwable: Throwable) {
         val message = when (throwable) {
             is FirebaseAuthInvalidCredentialsException -> context.getString(R.string.validation_msg_invalid_credetials_login)
+            is EmailNotVerifiedException -> throwable.message!!
             else -> context.getString(R.string.unknown_error_message)
         }
 

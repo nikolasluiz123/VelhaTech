@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -35,7 +36,16 @@ fun VelhaTechNavHost(
 
         roomListScreen(
             onNavigateToRoomCreation = navController::navigateToRoomScreen,
-            onNavigateToGame = navController::navigateToGameScreen
+            onNavigateToGame = navController::navigateToGameScreen,
+            onLogoutClick = {
+                navController.navigateToLoginScreen(
+                    navOptions = navOptions {
+                        popUpTo(loginScreenRoute) {
+                            inclusive = true
+                        }
+                    }
+                )
+            }
         )
 
         roomScreen(

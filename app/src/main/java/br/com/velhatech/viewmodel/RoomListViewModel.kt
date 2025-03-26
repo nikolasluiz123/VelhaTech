@@ -122,4 +122,8 @@ class RoomListViewModel @Inject constructor(
 
         roomRepository.removeRoomListListener()
     }
+
+    fun logout() {
+        commonFirebaseAuthService.logout()
+    }
 }

@@ -1,15 +1,20 @@
 package br.com.velhatech.viewmodel
 
+import android.R.id.message
 import android.content.Context
 import br.com.velhatech.R
 import br.com.velhatech.components.fields.state.TextField
 import br.com.velhatech.core.callback.showErrorDialog
+import br.com.velhatech.core.exceptions.NoLoggingException
 import br.com.velhatech.core.state.MessageDialogState
 import br.com.velhatech.core.validation.FieldValidationError
+import br.com.velhatech.firebase.auth.exception.EmailNotVerifiedException
 import br.com.velhatech.screen.registeruser.enums.EnumValidatedUserFields
 import br.com.velhatech.state.RegisterUserUIState
 import br.com.velhatech.usecase.SaveUserUseCase
 import br.com.velhatech.viewmodel.common.VelhaTechViewModel
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -31,9 +36,15 @@ class RegisterUserViewModel @Inject constructor(
     }
 
     override fun onShowError(throwable: Throwable) {
-        _uiState.value.messageDialogState.onShowDialog?.showErrorDialog(
-            message = context.getString(R.string.unknown_error_message)
-        )
+        _uiState.value.onToggleLoading()
+
+        val message = when (throwable) {
+            is FirebaseAuthWeakPasswordException -> context.getString(R.string.register_user_screen_weak_password_message)
+            is FirebaseAuthUserCollisionException -> context.getString(R.string.register_user_screen_user_collision_message)
+            else -> context.getString(R.string.unknown_error_message)
+        }
+
+        _uiState.value.messageDialogState.onShowDialog?.showErrorDialog(message = message)
     }
 
     private fun initialLoadUIState() {

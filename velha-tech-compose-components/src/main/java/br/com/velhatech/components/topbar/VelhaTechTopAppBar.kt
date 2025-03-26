@@ -21,12 +21,10 @@ import br.com.velhatech.core.theme.VelhaTechTheme
  *
  * @param title Título da app bar
  * @param onBackClick Ação ao clicar no ícone da esquerda.
- * @param onLogoutClick Ação ao clicar no item de menu Logout.
  * @param actions Ações exibidas a direita da barra.
  * @param menuItems Itens de menu exibidos dentro do MoreOptions.
  * @param colors Cores da barra.
  * @param showNavigationIcon Flag para exibir ícone de navação ou não.
- * @param showMenuWithLogout Flag para exibir o menu com a opção de Logout.
  *
  * @author Nikolas Luiz Schmitt
  */
@@ -35,7 +33,6 @@ import br.com.velhatech.core.theme.VelhaTechTheme
 fun VelhaTechTopAppBar(
     title: @Composable () -> Unit,
     onBackClick: () -> Unit,
-    onLogoutClick: () -> Unit = { },
     actions: @Composable () -> Unit = { },
     menuItems: @Composable () -> Unit = { },
     colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -83,7 +80,6 @@ fun FitnessProTopAppBarPreview() {
             VelhaTechTopAppBar(
                 title = { Text("Título da Tela") },
                 onBackClick = { },
-                onLogoutClick = { }
             )
         }
     }

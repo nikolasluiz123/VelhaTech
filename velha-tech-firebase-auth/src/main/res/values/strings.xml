@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="firebase_default_auth_email_not_verfied_message">Você precisa verificar seu email antes de prosseguir.</string>
+</resources>

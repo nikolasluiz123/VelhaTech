@@ -1,6 +1,7 @@
 package br.com.velhatech.screen.registeruser
 
 import android.content.Context
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -97,6 +98,7 @@ fun RegisterUserScreen(
                 }
             }
         },
+        contentWindowInsets = WindowInsets(0.dp)
     ) { padding ->
         ConstraintLayout(
             Modifier
@@ -141,7 +143,7 @@ fun RegisterUserScreen(
 
                             width = Dimension.fillToConstraints
                         },
-                    field = state.email,
+                    field = state.name,
                     label = stringResource(R.string.register_user_screen_label_name),
                     keyboardOptions = PersonNameKeyboardOptions,
                 )

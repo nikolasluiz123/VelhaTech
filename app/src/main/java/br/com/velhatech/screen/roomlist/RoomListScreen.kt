@@ -20,6 +20,7 @@ import br.com.velhatech.R
 import br.com.velhatech.components.bottombar.VelhaTechBottomAppBar
 import br.com.velhatech.components.buttons.fab.FloatingActionButtonAdd
 import br.com.velhatech.components.buttons.icons.IconButtonAccount
+import br.com.velhatech.components.buttons.icons.IconButtonLogout
 import br.com.velhatech.components.buttons.icons.IconButtonRanking
 import br.com.velhatech.components.filter.SimpleFilter
 import br.com.velhatech.components.list.LazyVerticalList
@@ -38,14 +39,19 @@ import com.google.firebase.ktx.Firebase
 fun RoomListScreen(
     viewModel: RoomListViewModel,
     onNavigateToRoomCreation: () -> Unit,
-    onNavigateToGame: OnNavigateToGame
+    onNavigateToGame: OnNavigateToGame,
+    onLogoutClick: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
     RoomListScreen(
         state = state,
         onNavigateToRoomCreation = onNavigateToRoomCreation,
-        onNavigateToGame = onNavigateToGame
+        onNavigateToGame = onNavigateToGame,
+        onLogoutClick = {
+            viewModel.logout()
+            onLogoutClick()
+        }
     )
 }
 
@@ -54,7 +60,8 @@ fun RoomListScreen(
 fun RoomListScreen(
     state: RoomListUIState = RoomListUIState(),
     onNavigateToRoomCreation: () -> Unit = { },
-    onNavigateToGame: OnNavigateToGame? = null
+    onNavigateToGame: OnNavigateToGame? = null,
+    onLogoutClick: () -> Unit = { }
 ) {
     Scaffold(
         topBar = {
@@ -69,6 +76,9 @@ fun RoomListScreen(
                             // TODO - Perfil
                         }
                     )
+                },
+                actions = {
+                    IconButtonLogout(onClick = onLogoutClick)
                 }
             )
         },

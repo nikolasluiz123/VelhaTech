@@ -15,8 +15,12 @@ import dagger.hilt.components.SingletonComponent
 class SingletonFirebaseModule {
 
     @Provides
-    fun provideDefaultAuthenticationService(): FirebaseDefaultAuthenticationService {
-        return FirebaseDefaultAuthenticationService()
+    fun provideDefaultAuthenticationService(
+        @ApplicationContext context: Context
+    ): FirebaseDefaultAuthenticationService {
+        return FirebaseDefaultAuthenticationService(
+            context = context
+        )
     }
 
     @Provides

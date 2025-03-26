@@ -1,6 +1,10 @@
 package br.com.velhatech.firebase.auth.implementations
 
+import android.content.Context
+import br.com.velhatech.firebase.auth.R
+import br.com.velhatech.firebase.auth.exception.EmailNotVerifiedException
 import br.com.velhatech.firebase.auth.user.User
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
@@ -9,10 +13,15 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FirebaseDefaultAuthenticationService: CommonFirebaseAuthenticationService() {
+class FirebaseDefaultAuthenticationService(val context: Context): CommonFirebaseAuthenticationService() {
 
     suspend fun authenticate(email: String, password: String): Unit = withContext(IO) {
         Firebase.auth.signInWithEmailAndPassword(email, password).await()
+
+        if (Firebase.auth.currentUser?.isEmailVerified == false) {
+            logout()
+            throw EmailNotVerifiedException(context.getString(R.string.firebase_default_auth_email_not_verfied_message))
+        }
     }
 
     suspend fun save(user: User): Unit = withContext(IO) {
@@ -30,6 +39,7 @@ class FirebaseDefaultAuthenticationService: CommonFirebaseAuthenticationService(
 
         Firebase.auth.createUserWithEmailAndPassword(user.email!!, user.password!!).await()
         Firebase.auth.currentUser?.updateProfile(userProfileChangeRequest)?.await()
+        Firebase.auth.currentUser?.sendEmailVerification()?.await()
     }
 
     private suspend fun updateUserInfos(user: User): Unit = withContext(IO) {
@@ -40,7 +50,7 @@ class FirebaseDefaultAuthenticationService: CommonFirebaseAuthenticationService(
                 firebaseUser.verifyBeforeUpdateEmail(user.email!!).await()
                 firebaseUser.updatePassword(user.password!!).await()
                 firebaseUser.updateProfile(displayNameChangeRequest).await()
-            } catch (ex: FirebaseAuthRecentLoginRequiredException) {
+            } catch (_: FirebaseAuthRecentLoginRequiredException) {
                 logout()
                 authenticate(user.email!!, user.password!!)
                 updateUserInfos(user)

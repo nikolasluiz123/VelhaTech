@@ -33,7 +33,6 @@ import br.com.velhatech.core.theme.TopAppBarTitleTextStyle
 fun SimpleVelhaTechTopAppBar(
     title: String,
     subtitle: String? = null,
-    onLogoutClick: () -> Unit = { },
     onBackClick: () -> Unit = { },
     actions: @Composable () -> Unit = { },
     menuItems: @Composable () -> Unit = { },
@@ -69,7 +68,6 @@ fun SimpleVelhaTechTopAppBar(
         showNavigationIcon = showNavigationIcon,
         customNavigationIcon = customNavigationIcon,
         onBackClick = onBackClick,
-        onLogoutClick = onLogoutClick,
         showMenu = showMenu
     )
 }

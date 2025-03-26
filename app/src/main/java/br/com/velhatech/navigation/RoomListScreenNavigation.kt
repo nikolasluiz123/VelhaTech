@@ -13,7 +13,8 @@ const val roomListScreenRoute = "roomList"
 
 fun NavGraphBuilder.roomListScreen(
     onNavigateToRoomCreation: () -> Unit,
-    onNavigateToGame: OnNavigateToGame
+    onNavigateToGame: OnNavigateToGame,
+    onLogoutClick: () -> Unit
 ) {
     composable(route = roomListScreenRoute) {
         val loginViewModel = hiltViewModel<RoomListViewModel>()
@@ -21,7 +22,8 @@ fun NavGraphBuilder.roomListScreen(
         RoomListScreen(
             viewModel = loginViewModel,
             onNavigateToRoomCreation = onNavigateToRoomCreation,
-            onNavigateToGame = onNavigateToGame
+            onNavigateToGame = onNavigateToGame,
+            onLogoutClick = onLogoutClick
         )
     }
 }

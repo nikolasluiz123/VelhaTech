@@ -1,3 +1,6 @@
 package br.com.velhatech.core.exceptions
 
-class NoLoggingException(message: String, cause: Throwable): Exception(message, cause)
+open class NoLoggingException : Exception {
+    constructor(message: String) : super(message)
+    constructor(message: String, cause: Throwable?) : super(message, cause)
+}
