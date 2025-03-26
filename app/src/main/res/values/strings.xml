@@ -49,4 +49,5 @@
     <string name="game_screen_room_exit_confirm_message">Você tem certeza que deseja sair da sala?</string>
     <string name="register_user_screen_weak_password_message">Sua senha precisa ter ao menos 6 caracteres.</string>
     <string name="register_user_screen_user_collision_message">Esse e-mail já está em uso.</string>
+    <string name="game_screen_subtitle_two_players">%1$s vs %2$s</string>
 </resources>

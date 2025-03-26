@@ -7,6 +7,7 @@ import br.com.velha.tech.core.callback.showErrorDialog
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
+import br.com.velha.tech.firebase.to.TORoom
 import br.com.velha.tech.navigation.GameScreenArgs
 import br.com.velha.tech.navigation.gameScreenArgument
 import br.com.velha.tech.repository.RoomRepository
@@ -54,14 +55,34 @@ class GameViewModel @Inject constructor(
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
         launch {
-            val room = roomRepository.findRoomById(args.roomId)!!
-
             roomRepository.addAuthenticatedPlayerToRoom(roomId = args.roomId)
+
+            val room = roomRepository.findRoomById(args.roomId)!!
 
             _uiState.value = _uiState.value.copy(
                 title = room.roomName!!,
+                subtitle = getSubtitle(room)
             )
         }
+    }
+
+    private fun getSubtitle(room: TORoom): String {
+        return if (room.playersCount == 1) {
+            getAbbreviatedName(room.players[0].name)
+        } else {
+            context.getString(
+                R.string.game_screen_subtitle_two_players,
+                getAbbreviatedName(room.players[0].name),
+                getAbbreviatedName(room.players[1].name)
+            )
+        }
+    }
+
+    private fun getAbbreviatedName(name: String): String {
+        val first = name.split(" ").first()
+        val last = name.split(" ").last()
+
+        return "$first ${last[0]}."
     }
 
     private fun initializeMessageDialogState(): MessageDialogState {
