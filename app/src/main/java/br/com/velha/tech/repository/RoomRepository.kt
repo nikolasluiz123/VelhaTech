@@ -12,6 +12,7 @@ class RoomRepository(
     private val firestoreRoomService: FirestoreRoomService,
 ) {
     private var roomListListener: ListenerRegistration? = null
+    private var roomPlayersListListener: ListenerRegistration? = null
 
     suspend fun saveRoom(toRoom: TORoom) {
         val room = toRoom.toRoomDocument()
@@ -33,6 +34,21 @@ class RoomRepository(
         )
     }
 
+    fun addRoomPlayerListListener(
+        roomId: String,
+        onSuccess: (List<TOPlayer>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        roomPlayersListListener = firestoreRoomService.addRoomPlayerListListener(
+            roomId = roomId,
+            onSuccess = {
+                val result = it.map { it.toTOPlayer() }
+                onSuccess(result)
+            },
+            onError = onError
+        )
+    }
+
     suspend fun findRoomById(roomId: String): TORoom? {
         return firestoreRoomService.findRoomById(roomId)?.toTORoom()
     }
@@ -48,13 +64,20 @@ class RoomRepository(
     suspend fun removePlayerFromRoom(roomId: String) {
         firestoreRoomService.removeAuthenticatedPlayerFromRoom(roomId)
     }
+
+    suspend fun findPlayersFromRoom(roomId: String): List<TOPlayer> {
+        return firestoreRoomService.findPlayersFromRoom(roomId).map { it.toTOPlayer() }
+    }
+
+    fun removeRoomPlayerListListener() {
+        roomPlayersListListener?.remove()
+    }
 }
 
 fun TORoom.toRoomDocument(): RoomDocument {
     val document = RoomDocument(
         roomName = roomName,
         roundsCount = roundsCount,
-        players = players.map { it.toPlayerDocument() }.toMutableList(),
         difficultLevel = difficultLevel?.name,
         password = password,
         playersCount = playersCount
@@ -70,7 +93,6 @@ fun RoomDocument.toTORoom(): TORoom {
         id = id,
         roomName = roomName,
         roundsCount = roundsCount,
-        players = players.map { it.toTOPlayer() }.toMutableList(),
         difficultLevel = EnumDifficultLevel.valueOf(difficultLevel!!),
         password = password,
         playersCount = playersCount,

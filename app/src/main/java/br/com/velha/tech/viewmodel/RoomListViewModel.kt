@@ -123,6 +123,21 @@ class RoomListViewModel @Inject constructor(
         roomRepository.removeRoomListListener()
     }
 
+    fun onValidateNavigationToGame(roomId: String, onNavigate: () -> Unit) {
+        launch {
+            val userId = commonFirebaseAuthService.getAuthenticatedUser()!!.id
+            val players = roomRepository.findPlayersFromRoom(roomId)
+
+            if (players.size == 2 && players.none { it.userId == userId }) {
+                _uiState.value.messageDialogState.onShowDialog?.showErrorDialog(
+                    message = context.getString(R.string.room_list_screen_full_room_message)
+                )
+            } else {
+                onNavigate()
+            }
+        }
+    }
+
     fun logout() {
         commonFirebaseAuthService.logout()
     }

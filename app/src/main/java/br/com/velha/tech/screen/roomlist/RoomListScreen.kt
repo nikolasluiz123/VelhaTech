@@ -32,6 +32,7 @@ import br.com.velha.tech.core.extensions.calculatePaddingTopWithoutMargin
 import br.com.velha.tech.core.theme.VelhaTechTheme
 import br.com.velha.tech.firebase.apis.analytics.logButtonClick
 import br.com.velha.tech.screen.game.callback.OnNavigateToGame
+import br.com.velha.tech.screen.roomlist.callback.OnValidateNavigationToGame
 import br.com.velha.tech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velha.tech.state.RoomListUIState
 import br.com.velha.tech.viewmodel.RoomListViewModel
@@ -53,6 +54,7 @@ fun RoomListScreen(
         state = state,
         onNavigateToRoomCreation = onNavigateToRoomCreation,
         onNavigateToGame = onNavigateToGame,
+        onValidateNavigationToGame = viewModel::onValidateNavigationToGame,
         onLogoutClick = {
             viewModel.logout()
             onLogoutClick()
@@ -66,7 +68,8 @@ fun RoomListScreen(
     state: RoomListUIState = RoomListUIState(),
     onNavigateToRoomCreation: () -> Unit = { },
     onNavigateToGame: OnNavigateToGame? = null,
-    onLogoutClick: () -> Unit = { }
+    onLogoutClick: () -> Unit = { },
+    onValidateNavigationToGame: OnValidateNavigationToGame? = null
 ) {
     Scaffold(
         topBar = {
@@ -137,7 +140,8 @@ fun RoomListScreen(
             ) {
                 RoomLazyVerticalList(
                     state = state,
-                    onNavigateToGame = onNavigateToGame
+                    onNavigateToGame = onNavigateToGame,
+                    onValidateNavigationToGame = onValidateNavigationToGame
                 )
             }
 
@@ -151,7 +155,8 @@ fun RoomListScreen(
                     height = Dimension.fillToConstraints
                 },
                 state = state,
-                onNavigateToGame = onNavigateToGame
+                onNavigateToGame = onNavigateToGame,
+                onValidateNavigationToGame = onValidateNavigationToGame
             )
         }
     }
@@ -161,10 +166,9 @@ fun RoomListScreen(
 private fun RoomLazyVerticalList(
     state: RoomListUIState,
     modifier: Modifier = Modifier,
-    onNavigateToGame: OnNavigateToGame?
+    onNavigateToGame: OnNavigateToGame?,
+    onValidateNavigationToGame: OnValidateNavigationToGame?
 ) {
-    val context = LocalContext.current
-
     LazyVerticalList(
         modifier = modifier,
         items = state.filteredRooms,
@@ -172,13 +176,8 @@ private fun RoomLazyVerticalList(
     ) { toRoom ->
         RoomListItem(
             room = toRoom,
-            onNavigateToGame = {
-                if (toRoom.playersCount == 2 && toRoom.players.none { it.userId == Firebase.auth.currentUser?.uid }) {
-                    state.messageDialogState.onShowDialog?.showInformationDialog(context.getString(R.string.room_list_screen_full_room_message))
-                } else {
-                    onNavigateToGame?.onExecute(it)
-                }
-            }
+            onNavigateToGame = onNavigateToGame,
+            onValidateNavigationToGame = onValidateNavigationToGame
         )
     }
 }

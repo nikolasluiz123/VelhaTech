@@ -16,7 +16,6 @@ internal val populatedUIState = RoomListUIState(
         TORoom(
             roomName = "Sala 1",
             roundsCount = 3,
-            players = arrayListOf(TOPlayer("1", "player 1")),
             playersCount = 1,
             difficultLevel = EnumDifficultLevel.EASY,
             password = null,
@@ -24,7 +23,6 @@ internal val populatedUIState = RoomListUIState(
         TORoom(
             roomName = "Sala 2",
             roundsCount = 5,
-            players = arrayListOf(TOPlayer("1", "player 1")),
             playersCount = 1,
             difficultLevel = EnumDifficultLevel.HARD,
             password = "123",

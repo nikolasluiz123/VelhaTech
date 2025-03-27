@@ -6,7 +6,6 @@ data class RoomDocument(
     var id: String = UUID.randomUUID().toString(),
     val roomName: String? = null,
     val roundsCount: Int? = null,
-    val players: MutableList<PlayerDocument> = mutableListOf(),
     var playersCount: Int = 0,
     val difficultLevel: String? = null,
     val password: String? = null,

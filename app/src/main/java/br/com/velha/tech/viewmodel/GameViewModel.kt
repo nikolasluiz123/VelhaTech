@@ -1,13 +1,13 @@
 package br.com.velha.tech.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
 import br.com.velha.tech.core.state.MessageDialogState
-import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
-import br.com.velha.tech.firebase.to.TORoom
+import br.com.velha.tech.firebase.to.TOPlayer
 import br.com.velha.tech.navigation.GameScreenArgs
 import br.com.velha.tech.navigation.gameScreenArgument
 import br.com.velha.tech.repository.RoomRepository
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.update
 class GameViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val roomRepository: RoomRepository,
-    private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService,
     savedStateHandle: SavedStateHandle
 ): VelhaTechViewModel(context) {
 
@@ -36,6 +35,7 @@ class GameViewModel @Inject constructor(
     init {
         initialLoadUIState()
         loadUIStateWithDatabaseInfos()
+        addRoomPlayerListListener()
     }
 
     private fun initialLoadUIState() {
@@ -61,19 +61,35 @@ class GameViewModel @Inject constructor(
 
             _uiState.value = _uiState.value.copy(
                 title = room.roomName!!,
-                subtitle = getSubtitle(room)
             )
         }
     }
 
-    private fun getSubtitle(room: TORoom): String {
-        return if (room.playersCount == 1) {
-            getAbbreviatedName(room.players[0].name)
+    private fun addRoomPlayerListListener() {
+        val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
+
+        roomRepository.addRoomPlayerListListener(
+            roomId = args.roomId,
+            onSuccess = { players ->
+                _uiState.value = _uiState.value.copy(
+                    subtitle = getSubtitle(players)
+                )
+            },
+            onError = { exception ->
+                onShowError(exception)
+                onError(exception)
+            }
+        )
+    }
+
+    private fun getSubtitle(players: List<TOPlayer>): String {
+        return if (players.size == 1) {
+            getAbbreviatedName(players[0].name)
         } else {
             context.getString(
                 R.string.game_screen_subtitle_two_players,
-                getAbbreviatedName(room.players[0].name),
-                getAbbreviatedName(room.players[1].name)
+                getAbbreviatedName(players[0].name),
+                getAbbreviatedName(players[1].name)
             )
         }
     }
@@ -114,11 +130,14 @@ class GameViewModel @Inject constructor(
         )
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        roomRepository.removeRoomPlayerListListener()
+    }
+
     fun onBackClick(onSuccess: () -> Unit) {
         launch {
-            val user = commonFirebaseAuthenticationService.getAuthenticatedUser()
             val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
-
             roomRepository.removePlayerFromRoom(roomId = args.roomId)
             onSuccess()
         }

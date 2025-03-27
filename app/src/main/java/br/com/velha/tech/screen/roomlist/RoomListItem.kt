@@ -20,14 +20,15 @@ import br.com.velha.tech.R
 import br.com.velha.tech.components.LabeledText
 import br.com.velha.tech.core.theme.VelhaTechTheme
 import br.com.velha.tech.firebase.enums.EnumDifficultLevel
-import br.com.velha.tech.firebase.to.TOPlayer
 import br.com.velha.tech.firebase.to.TORoom
 import br.com.velha.tech.navigation.GameScreenArgs
 import br.com.velha.tech.screen.game.callback.OnNavigateToGame
+import br.com.velha.tech.screen.roomlist.callback.OnValidateNavigationToGame
 
 @Composable
 fun RoomListItem(
     room: TORoom,
+    onValidateNavigationToGame: OnValidateNavigationToGame? = null,
     onNavigateToGame: OnNavigateToGame? = null
 ) {
     val context = LocalContext.current
@@ -36,7 +37,14 @@ fun RoomListItem(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onNavigateToGame?.onExecute(GameScreenArgs(room.id!!)) }
+            .clickable {
+                onValidateNavigationToGame?.onExecute(
+                    roomId = room.id!!,
+                    onNavigate = {
+                        onNavigateToGame?.onExecute(GameScreenArgs(room.id!!))
+                    }
+                )
+            }
     ) {
         val (roomNameRef, roundsRef, playersRef, difficultLevelRef, authIconRef, dividerRef) = createRefs()
 
@@ -145,7 +153,6 @@ private fun RoomListItemPreviewDark() {
                 room = TORoom(
                     roomName = "Sala da Loucura",
                     roundsCount = 5,
-                    players = arrayListOf(TOPlayer("1", "player 1")),
                     difficultLevel = EnumDifficultLevel.EASY
                 )
             )
@@ -162,7 +169,6 @@ private fun RoomListItemPreviewLight() {
                 room = TORoom(
                     roomName = "Sala da Loucura",
                     roundsCount = 5,
-                    players = arrayListOf(TOPlayer("1", "player 1")),
                     difficultLevel = EnumDifficultLevel.EASY
                 )
             )
