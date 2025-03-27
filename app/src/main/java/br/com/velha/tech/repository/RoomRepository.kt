@@ -12,7 +12,6 @@ class RoomRepository(
     private val firestoreRoomService: FirestoreRoomService,
 ) {
     private var roomListListener: ListenerRegistration? = null
-    private var roomPlayersListListener: ListenerRegistration? = null
 
     suspend fun saveRoom(toRoom: TORoom) {
         val room = toRoom.toRoomDocument()
@@ -34,21 +33,6 @@ class RoomRepository(
         )
     }
 
-    fun addRoomPlayerListListener(
-        roomId: String,
-        onSuccess: (List<TOPlayer>) -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        roomPlayersListListener = firestoreRoomService.addRoomPlayerListListener(
-            roomId = roomId,
-            onSuccess = {
-                val result = it.map { it.toTOPlayer() }
-                onSuccess(result)
-            },
-            onError = onError
-        )
-    }
-
     suspend fun findRoomById(roomId: String): TORoom? {
         return firestoreRoomService.findRoomById(roomId)?.toTORoom()
     }
@@ -56,59 +40,4 @@ class RoomRepository(
     fun removeRoomListListener() {
         roomListListener?.remove()
     }
-
-    suspend fun addAuthenticatedPlayerToRoom(roomId: String) {
-        firestoreRoomService.addAuthenticatedPlayerToRoom(roomId)
-    }
-
-    suspend fun removePlayerFromRoom(roomId: String) {
-        firestoreRoomService.removeAuthenticatedPlayerFromRoom(roomId)
-    }
-
-    suspend fun findPlayersFromRoom(roomId: String): List<TOPlayer> {
-        return firestoreRoomService.findPlayersFromRoom(roomId).map { it.toTOPlayer() }
-    }
-
-    fun removeRoomPlayerListListener() {
-        roomPlayersListListener?.remove()
-    }
-}
-
-fun TORoom.toRoomDocument(): RoomDocument {
-    val document = RoomDocument(
-        roomName = roomName,
-        roundsCount = roundsCount,
-        difficultLevel = difficultLevel?.name,
-        password = password,
-        playersCount = playersCount
-    )
-
-    id?.let { document.id = it }
-
-    return document
-}
-
-fun RoomDocument.toTORoom(): TORoom {
-    return TORoom(
-        id = id,
-        roomName = roomName,
-        roundsCount = roundsCount,
-        difficultLevel = EnumDifficultLevel.valueOf(difficultLevel!!),
-        password = password,
-        playersCount = playersCount,
-    )
-}
-
-fun PlayerDocument.toTOPlayer(): TOPlayer {
-    return TOPlayer(
-        userId = userId!!,
-        name = name!!
-    )
-}
-
-fun TOPlayer.toPlayerDocument(): PlayerDocument {
-    return PlayerDocument(
-        userId = userId,
-        name = name
-    )
 }

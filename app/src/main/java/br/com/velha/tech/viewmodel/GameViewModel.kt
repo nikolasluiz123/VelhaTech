@@ -10,6 +10,7 @@ import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.to.TOPlayer
 import br.com.velha.tech.navigation.GameScreenArgs
 import br.com.velha.tech.navigation.gameScreenArgument
+import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
 import br.com.velha.tech.state.GameUIState
 import br.com.velha.tech.viewmodel.common.VelhaTechViewModel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.update
 class GameViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val roomRepository: RoomRepository,
+    private val roomPlayersRepository: RoomPlayersRepository,
     savedStateHandle: SavedStateHandle
 ): VelhaTechViewModel(context) {
 
@@ -55,7 +57,7 @@ class GameViewModel @Inject constructor(
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
         launch {
-            roomRepository.addAuthenticatedPlayerToRoom(roomId = args.roomId)
+            roomPlayersRepository.addAuthenticatedPlayerToRoom(roomId = args.roomId)
 
             val room = roomRepository.findRoomById(args.roomId)!!
 
@@ -68,7 +70,7 @@ class GameViewModel @Inject constructor(
     private fun addRoomPlayerListListener() {
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
-        roomRepository.addRoomPlayerListListener(
+        roomPlayersRepository.addRoomPlayerListListener(
             roomId = args.roomId,
             onSuccess = { players ->
                 _uiState.value = _uiState.value.copy(
@@ -132,13 +134,13 @@ class GameViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        roomRepository.removeRoomPlayerListListener()
+        roomPlayersRepository.removeRoomPlayerListListener()
     }
 
     fun onBackClick(onSuccess: () -> Unit) {
         launch {
             val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
-            roomRepository.removePlayerFromRoom(roomId = args.roomId)
+            roomPlayersRepository.removePlayerFromRoom(roomId = args.roomId)
             onSuccess()
         }
     }

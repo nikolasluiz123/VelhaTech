@@ -8,6 +8,7 @@ import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.apis.analytics.logSimpleFilterClick
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velha.tech.firebase.to.TORoom
+import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
 import br.com.velha.tech.screen.roomlist.enums.EnumRoomListTags
 import br.com.velha.tech.state.RoomListUIState
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.update
 class RoomListViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val roomRepository: RoomRepository,
+    private val roomPlayersRepository: RoomPlayersRepository,
     private val commonFirebaseAuthService: CommonFirebaseAuthenticationService
 ): VelhaTechViewModel(context) {
 
@@ -126,7 +128,7 @@ class RoomListViewModel @Inject constructor(
     fun onValidateNavigationToGame(roomId: String, onNavigate: () -> Unit) {
         launch {
             val userId = commonFirebaseAuthService.getAuthenticatedUser()!!.id
-            val players = roomRepository.findPlayersFromRoom(roomId)
+            val players = roomPlayersRepository.findPlayersFromRoom(roomId)
 
             if (players.size == 2 && players.none { it.userId == userId }) {
                 _uiState.value.messageDialogState.onShowDialog?.showErrorDialog(

@@ -2,7 +2,9 @@ package br.com.velha.tech.injection
 
 import br.com.velha.tech.firebase.auth.implementations.FirebaseDefaultAuthenticationService
 import br.com.velha.tech.firebase.auth.implementations.FirebaseGoogleAuthenticationService
+import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomService
+import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
 import br.com.velha.tech.repository.UserRepository
 import dagger.Module
@@ -33,4 +35,14 @@ class SingletonRepositoryModule {
             firestoreRoomService = firestoreRoomService,
         )
     }
+
+    @Provides
+    fun provideRoomPlayersRepository(
+        firestoreRoomPlayersService: FirestoreRoomPlayersService,
+    ): RoomPlayersRepository {
+        return RoomPlayersRepository(
+            firestoreRoomPlayersService = firestoreRoomPlayersService,
+        )
+    }
+
 }
