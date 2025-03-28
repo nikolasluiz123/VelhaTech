@@ -8,7 +8,7 @@ data class RoundDocument(
     var winnerName: String? = null,
     var preparingToStart: Boolean = false,
     var timerToStart: Int? = null,
-    var started: Boolean = false,
+    var playing: Boolean = false,
 ): FirestoreDocument() {
 
     companion object {

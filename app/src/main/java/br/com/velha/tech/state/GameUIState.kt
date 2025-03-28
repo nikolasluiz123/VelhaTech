@@ -2,12 +2,16 @@ package br.com.velha.tech.state
 
 import android.graphics.drawable.Drawable
 import br.com.velha.tech.core.state.MessageDialogState
+import br.com.velha.tech.firebase.to.TOPlayer
+import br.com.velha.tech.firebase.to.TORoom
+import br.com.velha.tech.firebase.to.TORound
 import java.time.LocalTime
 
 data class GameUIState(
     val title: String = "",
     val subtitle: String = "",
     val messageDialogState: MessageDialogState = MessageDialogState(),
+    val players: List<TOPlayer> = emptyList(),
     val isPaused: Boolean = false,
     val onChangePaused: (Boolean) -> Unit = { },
     val gameBoardState: GameBoardState = GameBoardState(),

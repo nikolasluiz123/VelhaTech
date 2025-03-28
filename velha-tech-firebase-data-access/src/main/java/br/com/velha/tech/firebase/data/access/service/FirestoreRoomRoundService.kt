@@ -31,11 +31,22 @@ class FirestoreRoomRoundService : FirestoreService() {
         roundDocument.apply {
             timerToStart = timerToStart!!.minus(1)
             preparingToStart = timerToStart!! > 0
-            started = timerToStart!! == 0
+            playing = timerToStart!! == 0
         }
 
         delay(1000)
         roundDocumentRef.update(roundDocument.toMap())
+    }
+
+    suspend fun getAllRoundsFinished(roomId: String): Boolean = withContext(IO) {
+        val querySnapshot = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+            .collection(RoundDocument.COLLECTION_NAME)
+            .whereEqualTo(RoundDocument::playing.name, true)
+            .limit(1)
+            .get()
+            .await()
+
+        querySnapshot.isEmpty
     }
 
     fun addRoundListener(

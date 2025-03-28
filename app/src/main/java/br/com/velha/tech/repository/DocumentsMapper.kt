@@ -56,7 +56,7 @@ fun RoundDocument.toTORound(): TORound {
         winnerName = winnerName,
         preparingToStart = preparingToStart,
         timerToStart = timerToStart,
-        started = started
+        playing = playing
     )
 }
 
@@ -66,7 +66,7 @@ fun TORound.toRoundDocument(): RoundDocument {
         winnerName = winnerName,
         preparingToStart = preparingToStart,
         timerToStart = timerToStart,
-        started = started
+        playing = playing
     )
 
     id?.let { document.id = it }

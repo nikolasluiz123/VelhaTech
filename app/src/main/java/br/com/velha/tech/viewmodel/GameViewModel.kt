@@ -1,7 +1,6 @@
 package br.com.velha.tech.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
@@ -66,7 +65,7 @@ class GameViewModel @Inject constructor(
             val room = roomRepository.findRoomById(args.roomId)!!
 
             _uiState.value = _uiState.value.copy(
-                title = room.roomName!!
+                title = room.roomName!!,
             )
         }
     }
@@ -85,7 +84,8 @@ class GameViewModel @Inject constructor(
             roomId = args.roomId,
             onSuccess = { players ->
                 _uiState.value = _uiState.value.copy(
-                    subtitle = getSubtitle(players)
+                    subtitle = getSubtitle(players),
+                    players = players
                 )
 
                 val authenticatedPlayer = players.firstOrNull {
@@ -105,7 +105,9 @@ class GameViewModel @Inject constructor(
 
     private fun startNewRound(authenticatedPlayer: TOPlayer, args: GameScreenArgs) {
         launch {
-            if (authenticatedPlayer.roomOwner) {
+            val allFinished = roundRepository.getAllRoundsFinished(args.roomId)
+
+            if (authenticatedPlayer.roomOwner && allFinished) {
                 roundRepository.startNewRound(roomId = args.roomId, roundNumber = 1)
             }
 
@@ -120,6 +122,10 @@ class GameViewModel @Inject constructor(
             roundRepository.addRoundListener(
                 roomId = args.roomId,
                 onSuccess = { round ->
+                    if (round.timerToStart == 10) {
+                        loadGameBoard()
+                    }
+
                     if (round.preparingToStart) {
                         showBlockUIStartingGame(round)
                         reduceTimerStartingGame(args, round)
@@ -133,6 +139,10 @@ class GameViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    private fun loadGameBoard() {
+
     }
 
     private fun showBlockUIStartingGame(round: TORound) {
