@@ -54,6 +54,7 @@ class FirestoreRoomPlayersService(
     suspend fun addAuthenticatedPlayerToRoom(roomId: String) = withContext(IO) {
         val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
         val playersCollectionRef = roomDocumentRef.collection(PlayerDocument.COLLECTION_NAME)
+        val oldPlayersCount = playersCollectionRef.get().await().size()
 
         val roomDocument = roomDocumentRef.get().await().toObject(RoomDocument::class.java)!!
         val user = commonFirebaseAuthenticationService.getAuthenticatedUser()!!
@@ -63,8 +64,8 @@ class FirestoreRoomPlayersService(
             db.runTransaction { transaction ->
                 val playerDocument = PlayerDocument(user.id, user.name, roomDocument.playersCount == 0)
 
-                transaction.set(playersCollectionRef.document(), playerDocument)
-                roomDocument.playersCount++
+                transaction.set(playersCollectionRef.document(user.id!!), playerDocument)
+                roomDocument.playersCount = oldPlayersCount + 1
                 transaction.update(roomDocumentRef, roomDocument.toMap())
             }.await()
         }
@@ -75,5 +76,25 @@ class FirestoreRoomPlayersService(
         val playersCollectionRef = roomDocumentRef.collection(PlayerDocument.COLLECTION_NAME)
 
         playersCollectionRef.get().await().documents.map { it.toObject(PlayerDocument::class.java)!! }
+    }
+
+    suspend fun sortFiguresToPlayers(roomId: String, figures: List<Int>): List<PlayerDocument> = withContext(IO) {
+        val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+        val playersCollectionRef = roomDocumentRef.collection(PlayerDocument.COLLECTION_NAME)
+        val documents = playersCollectionRef.get().await().documents
+        val players = documents.map { it.toObject(PlayerDocument::class.java)!! }
+
+        db.runTransaction { transaction ->
+            players.forEachIndexed { index, playerDocument ->
+                playerDocument.figure = figures[index]
+
+                transaction.update(
+                    playersCollectionRef.document(playerDocument.userId!!),
+                    playerDocument.toMap()
+                )
+            }
+        }.await()
+
+        players
     }
 }

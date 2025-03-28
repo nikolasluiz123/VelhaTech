@@ -33,11 +33,30 @@ data class GameRoundItem(
 )
 
 data class GameBoardState(
-    val userId: String = "",
     val playersFigure: List<Pair<String, Drawable>> = emptyList(),
-    val boardFigures: List<List<Int?>> = emptyList(),
+    val boardFigures: Array<Array<Int?>> = Array(3) { arrayOfNulls(3) },
     val onInputBoardClick: (rowIndex: Int, columnIndex: Int) -> Unit = { _, _ -> }
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as GameBoardState
+
+        if (playersFigure != other.playersFigure) return false
+        if (!boardFigures.contentDeepEquals(other.boardFigures)) return false
+        if (onInputBoardClick != other.onInputBoardClick) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = playersFigure.hashCode()
+        result = 31 * result + boardFigures.contentDeepHashCode()
+        result = 31 * result + onInputBoardClick.hashCode()
+        return result
+    }
+}
 
 data class BlockUIMessageState(
     val title: String = "",

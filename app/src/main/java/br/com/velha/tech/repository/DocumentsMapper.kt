@@ -37,14 +37,17 @@ fun PlayerDocument.toTOPlayer(): TOPlayer {
     return TOPlayer(
         userId = userId!!,
         name = name!!,
-        roomOwner = roomOwner
+        roomOwner = roomOwner,
+        figure = figure
     )
 }
 
 fun TOPlayer.toPlayerDocument(): PlayerDocument {
     return PlayerDocument(
         userId = userId,
-        name = name
+        name = name,
+        roomOwner = roomOwner,
+        figure = figure
     )
 }
 

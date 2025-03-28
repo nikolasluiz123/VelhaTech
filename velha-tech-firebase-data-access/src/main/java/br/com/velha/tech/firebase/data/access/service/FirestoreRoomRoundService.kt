@@ -39,14 +39,21 @@ class FirestoreRoomRoundService : FirestoreService() {
     }
 
     suspend fun getAllRoundsFinished(roomId: String): Boolean = withContext(IO) {
-        val querySnapshot = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+        val playingQuery = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
             .collection(RoundDocument.COLLECTION_NAME)
             .whereEqualTo(RoundDocument::playing.name, true)
             .limit(1)
             .get()
             .await()
 
-        querySnapshot.isEmpty
+        val preparingQuery = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+            .collection(RoundDocument.COLLECTION_NAME)
+            .whereEqualTo(RoundDocument::preparingToStart.name, true)
+            .limit(1)
+            .get()
+            .await()
+
+        playingQuery.isEmpty && preparingQuery.isEmpty
     }
 
     fun addRoundListener(

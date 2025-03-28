@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -30,6 +33,7 @@ fun GameBoard(
     state: GameBoardState = GameBoardState()
 ) {
     val linesColor = MaterialTheme.colorScheme.onBackground
+    val boardFigures by remember { mutableStateOf(state.boardFigures) }
 
     Box(
         modifier.border(
@@ -40,13 +44,15 @@ fun GameBoard(
         ),
         contentAlignment = Alignment.Center
     ) {
+
         Row {
-            repeat(3) { rowIndex ->
+            boardFigures.forEachIndexed { rowIndex, column ->
                 BoardColumn(
                     linesColor = linesColor,
                     drawLine = rowIndex < 2,
                     rowIndex = rowIndex,
-                    state = state
+                    state = state,
+                    column = column
                 )
             }
         }
@@ -58,7 +64,8 @@ private fun BoardColumn(
     linesColor: Color,
     drawLine: Boolean,
     rowIndex: Int,
-    state: GameBoardState
+    state: GameBoardState,
+    column: Array<Int?>
 ) {
     Column(
         Modifier
@@ -75,13 +82,14 @@ private fun BoardColumn(
                 }
             }
     ) {
-        repeat(3) { columnIndex ->
+        column.forEachIndexed { columnIndex, drawable ->
             BoardInput(
                 linesColor = linesColor,
                 drawLine = columnIndex < 2,
                 rowIndex = rowIndex,
                 columnIndex = columnIndex,
-                state = state
+                state = state,
+                drawable = drawable
             )
         }
     }
@@ -93,7 +101,8 @@ private fun BoardInput(
     drawLine: Boolean,
     rowIndex: Int,
     columnIndex: Int,
-    state: GameBoardState
+    state: GameBoardState,
+    drawable: Int?
 ) {
     Box(
         Modifier
@@ -114,13 +123,7 @@ private fun BoardInput(
                 state.onInputBoardClick(rowIndex, columnIndex)
             }
     ) {
-        val figure = try {
-            state.boardFigures[rowIndex][columnIndex]
-        } catch (_: IndexOutOfBoundsException) {
-            null
-        }
-
-        figure?.let { resId ->
+        drawable?.let { resId ->
             Image(
                 painter = painterResource(resId),
                 contentDescription = null,

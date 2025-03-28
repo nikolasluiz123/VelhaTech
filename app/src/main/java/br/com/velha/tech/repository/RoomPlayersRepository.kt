@@ -1,5 +1,6 @@
 package br.com.velha.tech.repository
 
+import br.com.velha.tech.core.R
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
 import br.com.velha.tech.firebase.to.TOPlayer
 import com.google.firebase.firestore.ListenerRegistration
@@ -34,6 +35,14 @@ class RoomPlayersRepository(
 
     suspend fun findPlayersFromRoom(roomId: String): List<TOPlayer> {
         return firestoreRoomPlayersService.findPlayersFromRoom(roomId).map { it.toTOPlayer() }
+    }
+
+    suspend fun sortFiguresToPlayers(roomId: String): List<TOPlayer> {
+        val figures = listOf(R.drawable.ic_x, R.drawable.ic_elipse)
+
+        return firestoreRoomPlayersService.sortFiguresToPlayers(roomId, figures).map {
+            it.toTOPlayer()
+        }
     }
 
     fun removeRoomPlayerListListener() {

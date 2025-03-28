@@ -1,6 +1,10 @@
 package br.com.velha.tech.viewmodel
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.util.Log
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
@@ -53,9 +57,28 @@ class GameViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isPaused = isPaused
                     )
-                }
+                },
+                gameBoardState = _uiState.value.gameBoardState.copy(
+                    onInputBoardClick = { rowIndex: Int, columnIndex: Int ->
+                        _uiState.value = _uiState.value.copy(
+                            gameBoardState = _uiState.value.gameBoardState.copy(
+                                boardFigures = _uiState.value.gameBoardState.boardFigures.apply {
+                                    this[rowIndex][columnIndex] = getPlayerFigure()
+                                }
+                            )
+                        )
+                    }
+                )
             )
         }
+    }
+
+    fun getPlayerFigure(): Int {
+        val authenticatedPlayer = _uiState.value.players.firstOrNull {
+            it.userId == commonFirebaseAuthenticationService.getAuthenticatedUser()!!.id
+        }
+
+        return authenticatedPlayer?.figure!!
     }
 
     private fun loadRoomName() {
@@ -142,7 +165,24 @@ class GameViewModel @Inject constructor(
     }
 
     private fun loadGameBoard() {
+        val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
+        launch {
+            val playersWithFigures = roomPlayersRepository.sortFiguresToPlayers(args.roomId)
+
+            _uiState.value = _uiState.value.copy(
+                players = playersWithFigures,
+                gameBoardState = _uiState.value.gameBoardState.copy(
+                    playersFigure = getFiguresPairList(playersWithFigures)
+                )
+            )
+        }
+    }
+
+    private fun getFiguresPairList(playersWithFigures: List<TOPlayer>): List<Pair<String, Drawable>> {
+        return playersWithFigures.map {
+            Pair(it.userId, ContextCompat.getDrawable(context, it.figure!!)!!)
+        }
     }
 
     private fun showBlockUIStartingGame(round: TORound) {
@@ -225,7 +265,12 @@ class GameViewModel @Inject constructor(
     fun onBackClick(onSuccess: () -> Unit) {
         launch {
             val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
-            roomPlayersRepository.removePlayerFromRoom(roomId = args.roomId)
+            val allFinished = roundRepository.getAllRoundsFinished(args.roomId)
+
+            if (allFinished) {
+                roomPlayersRepository.removePlayerFromRoom(roomId = args.roomId)
+            }
+
             onSuccess()
         }
     }
