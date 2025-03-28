@@ -48,7 +48,7 @@ class FirestoreRoomPlayersService(
             transaction.delete(playerDelete)
             roomDocument.playersCount--
             transaction.update(roomDocumentRef, roomDocument.toMap())
-        }
+        }.await()
     }
 
     suspend fun addAuthenticatedPlayerToRoom(roomId: String) = withContext(IO) {
@@ -61,10 +61,12 @@ class FirestoreRoomPlayersService(
 
         if (player == null) {
             db.runTransaction { transaction ->
-                transaction.set(playersCollectionRef.document(), PlayerDocument(user.id, user.name))
+                val playerDocument = PlayerDocument(user.id, user.name, roomDocument.playersCount == 0)
+
+                transaction.set(playersCollectionRef.document(), playerDocument)
                 roomDocument.playersCount++
                 transaction.update(roomDocumentRef, roomDocument.toMap())
-            }
+            }.await()
         }
     }
 

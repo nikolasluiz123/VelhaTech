@@ -3,8 +3,10 @@ package br.com.velha.tech.repository
 import br.com.velha.tech.firebase.enums.EnumDifficultLevel
 import br.com.velha.tech.firebase.models.PlayerDocument
 import br.com.velha.tech.firebase.models.RoomDocument
+import br.com.velha.tech.firebase.models.RoundDocument
 import br.com.velha.tech.firebase.to.TOPlayer
 import br.com.velha.tech.firebase.to.TORoom
+import br.com.velha.tech.firebase.to.TORound
 
 fun TORoom.toRoomDocument(): RoomDocument {
     val document = RoomDocument(
@@ -34,7 +36,8 @@ fun RoomDocument.toTORoom(): TORoom {
 fun PlayerDocument.toTOPlayer(): TOPlayer {
     return TOPlayer(
         userId = userId!!,
-        name = name!!
+        name = name!!,
+        roomOwner = roomOwner
     )
 }
 
@@ -43,4 +46,30 @@ fun TOPlayer.toPlayerDocument(): PlayerDocument {
         userId = userId,
         name = name
     )
+}
+
+
+fun RoundDocument.toTORound(): TORound {
+    return TORound(
+        id = id,
+        roundNumber = roundNumber,
+        winnerName = winnerName,
+        preparingToStart = preparingToStart,
+        timerToStart = timerToStart,
+        started = started
+    )
+}
+
+fun TORound.toRoundDocument(): RoundDocument {
+    val document = RoundDocument(
+        roundNumber = roundNumber,
+        winnerName = winnerName,
+        preparingToStart = preparingToStart,
+        timerToStart = timerToStart,
+        started = started
+    )
+
+    id?.let { document.id = it }
+
+    return document
 }

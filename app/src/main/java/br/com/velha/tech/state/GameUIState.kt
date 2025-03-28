@@ -11,7 +11,8 @@ data class GameUIState(
     val isPaused: Boolean = false,
     val onChangePaused: (Boolean) -> Unit = { },
     val gameBoardState: GameBoardState = GameBoardState(),
-    val gamePlayedRoundsListState: GamePlayedRoundsListState = GamePlayedRoundsListState()
+    val gamePlayedRoundsListState: GamePlayedRoundsListState = GamePlayedRoundsListState(),
+    val blockUIMessageState: BlockUIMessageState = BlockUIMessageState()
 )
 
 data class GamePlayedRoundsListState(
@@ -32,4 +33,10 @@ data class GameBoardState(
     val playersFigure: List<Pair<String, Drawable>> = emptyList(),
     val boardFigures: List<List<Int?>> = emptyList(),
     val onInputBoardClick: (rowIndex: Int, columnIndex: Int) -> Unit = { _, _ -> }
+)
+
+data class BlockUIMessageState(
+    val title: String = "",
+    val message: String = "",
+    val visible: Boolean = false
 )

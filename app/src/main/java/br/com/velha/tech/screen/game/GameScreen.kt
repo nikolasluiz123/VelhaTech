@@ -87,7 +87,7 @@ fun GameScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            val (gameBoardRef, playedRoundsRef) = createRefs()
+            val (gameBoardRef, playedRoundsRef, blockUIRef) = createRefs()
 
             VelhaTechMessageDialog(state = state.messageDialogState)
 
@@ -104,6 +104,16 @@ fun GameScreen(
                 state = state.gameBoardState,
                 modifier = Modifier.constrainAs(gameBoardRef) {
                     top.linkTo(playedRoundsRef.bottom)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
+
+            BlockUI(
+                state = state.blockUIMessageState,
+                modifier = Modifier.constrainAs(blockUIRef) {
+                    top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)

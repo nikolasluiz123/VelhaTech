@@ -51,4 +51,6 @@
     <string name="register_user_screen_user_collision_message">Esse e-mail já está em uso.</string>
     <string name="game_screen_subtitle_two_players">%1$s vs %2$s</string>
     <string name="room_list_screen_full_room_message">Essa sala já está cheia.</string>
+    <string name="game_screen_adversary_player_entered_title">O vai começar em breve!</string>
+    <string name="game_screen_adversary_player_entered_message">O jogo iniciará automaticamente em %d segundos…</string>
 </resources>

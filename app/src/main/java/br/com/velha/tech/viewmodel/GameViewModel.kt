@@ -7,11 +7,14 @@ import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
 import br.com.velha.tech.core.state.MessageDialogState
+import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velha.tech.firebase.to.TOPlayer
+import br.com.velha.tech.firebase.to.TORound
 import br.com.velha.tech.navigation.GameScreenArgs
 import br.com.velha.tech.navigation.gameScreenArgument
 import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
+import br.com.velha.tech.repository.RoomRoundRepository
 import br.com.velha.tech.state.GameUIState
 import br.com.velha.tech.viewmodel.common.VelhaTechViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +29,8 @@ class GameViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val roomRepository: RoomRepository,
     private val roomPlayersRepository: RoomPlayersRepository,
+    private val roundRepository: RoomRoundRepository,
+    private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService,
     savedStateHandle: SavedStateHandle
 ): VelhaTechViewModel(context) {
 
@@ -36,7 +41,8 @@ class GameViewModel @Inject constructor(
 
     init {
         initialLoadUIState()
-        loadUIStateWithDatabaseInfos()
+        loadRoomName()
+        addAuthenticatedPlayerToRoom()
         addRoomPlayerListListener()
     }
 
@@ -53,17 +59,22 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    private fun loadUIStateWithDatabaseInfos() {
+    private fun loadRoomName() {
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
         launch {
-            roomPlayersRepository.addAuthenticatedPlayerToRoom(roomId = args.roomId)
-
             val room = roomRepository.findRoomById(args.roomId)!!
 
             _uiState.value = _uiState.value.copy(
-                title = room.roomName!!,
+                title = room.roomName!!
             )
+        }
+    }
+
+    private fun addAuthenticatedPlayerToRoom() {
+        launch {
+            val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
+            roomPlayersRepository.addAuthenticatedPlayerToRoom(roomId = args.roomId)
         }
     }
 
@@ -76,11 +87,75 @@ class GameViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     subtitle = getSubtitle(players)
                 )
+
+                val authenticatedPlayer = players.firstOrNull {
+                    it.userId == commonFirebaseAuthenticationService.getAuthenticatedUser()!!.id
+                }
+
+                if (players.size == 2 && authenticatedPlayer != null) {
+                    startNewRound(authenticatedPlayer, args)
+                }
             },
             onError = { exception ->
                 onShowError(exception)
                 onError(exception)
             }
+        )
+    }
+
+    private fun startNewRound(authenticatedPlayer: TOPlayer, args: GameScreenArgs) {
+        launch {
+            if (authenticatedPlayer.roomOwner) {
+                roundRepository.startNewRound(roomId = args.roomId, roundNumber = 1)
+            }
+
+            addRoundListener()
+        }
+    }
+
+    private fun addRoundListener() {
+        launch {
+            val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
+
+            roundRepository.addRoundListener(
+                roomId = args.roomId,
+                onSuccess = { round ->
+                    if (round.preparingToStart) {
+                        showBlockUIStartingGame(round)
+                        reduceTimerStartingGame(args, round)
+                    } else {
+                        hideBlockUI()
+                    }
+                },
+                onError = {
+                    onShowError(it)
+                    onError(it)
+                }
+            )
+        }
+    }
+
+    private fun showBlockUIStartingGame(round: TORound) {
+        _uiState.value = _uiState.value.copy(
+            blockUIMessageState = _uiState.value.blockUIMessageState.copy(
+                title = context.getString(R.string.game_screen_adversary_player_entered_title),
+                message = context.getString(R.string.game_screen_adversary_player_entered_message, round.timerToStart),
+                visible = true
+            )
+        )
+    }
+
+    private fun reduceTimerStartingGame(args: GameScreenArgs, round: TORound) {
+        launch {
+            roundRepository.reduceRoundTimer(args.roomId, round.id!!)
+        }
+    }
+
+    private fun hideBlockUI() {
+        _uiState.value = _uiState.value.copy(
+            blockUIMessageState = _uiState.value.blockUIMessageState.copy(
+                visible = false
+            )
         )
     }
 

@@ -2,6 +2,7 @@ package br.com.velha.tech.firebase.data.access.injection
 
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
+import br.com.velha.tech.firebase.data.access.service.FirestoreRoomRoundService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomService
 import dagger.Module
 import dagger.Provides
@@ -28,5 +29,10 @@ class SingletonServiceModule {
         return FirestoreRoomPlayersService(
             commonFirebaseAuthenticationService = commonFirebaseAuthenticationService
         )
+    }
+
+    @Provides
+    fun provideFirestoreRoomRoundService(): FirestoreRoomRoundService {
+        return FirestoreRoomRoundService()
     }
 }

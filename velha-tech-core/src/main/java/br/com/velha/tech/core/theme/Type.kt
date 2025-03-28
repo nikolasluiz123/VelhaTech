@@ -40,14 +40,6 @@ val InputTextStyle = TextStyle(
     letterSpacing = 0.2.sp
 )
 
-val BottomSheetItemTextStyle = TextStyle(
-    fontFamily = FontFamily.SansSerif,
-    fontWeight = FontWeight.Normal,
-    fontSize = 14.sp,
-    lineHeight = 20.sp,
-    letterSpacing = 0.2.sp
-)
-
 val SnackBarTextStyle = TextStyle(
     fontFamily = FontFamily.SansSerif,
     fontWeight = FontWeight.Normal,
@@ -88,10 +80,6 @@ val LabelTextStyle = TextStyle(
     letterSpacing = 0.2.sp
 )
 
-val LabelFontWeightMediumTextStyle = LabelTextStyle.copy(
-    fontWeight = FontWeight.Medium
-)
-
 val ValueTextStyle = TextStyle(
     fontFamily = FontFamily.SansSerif,
     fontWeight = FontWeight.Light,
@@ -100,34 +88,18 @@ val ValueTextStyle = TextStyle(
     letterSpacing = 0.2.sp
 )
 
-val LabelGroupTextStyle = TextStyle(
-    fontFamily = FontFamily.SansSerif,
-    fontWeight = FontWeight.Medium,
-    fontSize = 12.sp,
-    lineHeight = 20.sp,
-    letterSpacing = 0.2.sp
-)
-
-val LabelCalendarDayTextStyle = TextStyle(
+val TitleMessageBlockUI = TextStyle(
     fontFamily = FontFamily.SansSerif,
     fontWeight = FontWeight.Medium,
     fontSize = 16.sp,
-    lineHeight = 18.sp,
-    letterSpacing = 0.sp
+    lineHeight = 20.sp,
+    letterSpacing = 0.25.sp
 )
 
-val LabelCalendarWeekTextStyle = TextStyle(
-    fontFamily = FontFamily.SansSerif,
-    fontWeight = FontWeight.Light,
-    fontSize = 12.sp,
-    lineHeight = 12.sp,
-    letterSpacing = 2.sp
-)
-
-val DialogTitleTextStyle = TextStyle(
+val MessageBlockUI = TextStyle(
     fontFamily = FontFamily.SansSerif,
     fontWeight = FontWeight.Normal,
-    fontSize = 18.sp,
+    fontSize = 14.sp,
     lineHeight = 20.sp,
-    letterSpacing = 0.2.sp
+    letterSpacing = 0.25.sp
 )
