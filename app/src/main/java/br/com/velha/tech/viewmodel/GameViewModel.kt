@@ -63,16 +63,20 @@ class GameViewModel @Inject constructor(
                 gameBoardState = _uiState.value.gameBoardState.copy(
                     onInputBoardClick = { rowIndex: Int, columnIndex: Int ->
                         launch {
-                            val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
                             val currentBoard = _uiState.value.gameBoardState.boardFigures
+                            val figureInPosition = currentBoard[rowIndex][columnIndex]
 
-                            val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
-                            newBoard[rowIndex][columnIndex] = getPlayerFigure()
+                            if (figureInPosition == 0) {
+                                val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
 
-                            gameBoardRepository.updateBoard(
-                                roomId = roomId,
-                                boardFigures = newBoard
-                            )
+                                val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
+                                newBoard[rowIndex][columnIndex] = getPlayerFigure()
+
+                                gameBoardRepository.updateBoard(
+                                    roomId = roomId,
+                                    boardFigures = newBoard
+                                )
+                            }
                         }
                     }
                 )
