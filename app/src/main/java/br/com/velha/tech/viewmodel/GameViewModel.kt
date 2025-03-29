@@ -60,11 +60,14 @@ class GameViewModel @Inject constructor(
                 },
                 gameBoardState = _uiState.value.gameBoardState.copy(
                     onInputBoardClick = { rowIndex: Int, columnIndex: Int ->
+                        val currentBoard = _uiState.value.gameBoardState.boardFigures
+
+                        val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
+                        newBoard[rowIndex][columnIndex] = getPlayerFigure()
+
                         _uiState.value = _uiState.value.copy(
                             gameBoardState = _uiState.value.gameBoardState.copy(
-                                boardFigures = _uiState.value.gameBoardState.boardFigures.apply {
-                                    this[rowIndex][columnIndex] = getPlayerFigure()
-                                }
+                                boardFigures = newBoard
                             )
                         )
                     }

@@ -33,7 +33,6 @@ fun GameBoard(
     state: GameBoardState = GameBoardState()
 ) {
     val linesColor = MaterialTheme.colorScheme.onBackground
-    val boardFigures by remember { mutableStateOf(state.boardFigures) }
 
     Box(
         modifier.border(
@@ -46,7 +45,7 @@ fun GameBoard(
     ) {
 
         Row {
-            boardFigures.forEachIndexed { rowIndex, column ->
+            state.boardFigures.forEachIndexed { rowIndex, column ->
                 BoardColumn(
                     linesColor = linesColor,
                     drawLine = rowIndex < 2,
