@@ -64,7 +64,7 @@ private fun BoardColumn(
     drawLine: Boolean,
     rowIndex: Int,
     state: GameBoardState,
-    column: Array<Int?>
+    column: Array<Int>
 ) {
     Column(
         Modifier
@@ -101,7 +101,7 @@ private fun BoardInput(
     rowIndex: Int,
     columnIndex: Int,
     state: GameBoardState,
-    drawable: Int?
+    drawable: Int
 ) {
     Box(
         Modifier
@@ -122,12 +122,12 @@ private fun BoardInput(
                 state.onInputBoardClick(rowIndex, columnIndex)
             }
     ) {
-        drawable?.let { resId ->
+        if (drawable != 0) {
             Image(
-                painter = painterResource(resId),
+                painter = painterResource(drawable),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.Center),
-                colorFilter = getIconColorFilter(resId)
+                colorFilter = getIconColorFilter(drawable)
             )
         }
     }

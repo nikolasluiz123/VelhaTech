@@ -3,8 +3,6 @@ package br.com.velha.tech.state
 import android.graphics.drawable.Drawable
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.to.TOPlayer
-import br.com.velha.tech.firebase.to.TORoom
-import br.com.velha.tech.firebase.to.TORound
 import java.time.LocalTime
 
 data class GameUIState(
@@ -34,7 +32,7 @@ data class GameRoundItem(
 
 data class GameBoardState(
     val playersFigure: List<Pair<String, Drawable>> = emptyList(),
-    val boardFigures: Array<Array<Int?>> = Array(3) { arrayOfNulls(3) },
+    val boardFigures: Array<Array<Int>> = Array(3) { arrayOf(0,0,0) },
     val onInputBoardClick: (rowIndex: Int, columnIndex: Int) -> Unit = { _, _ -> }
 ) {
     override fun equals(other: Any?): Boolean {

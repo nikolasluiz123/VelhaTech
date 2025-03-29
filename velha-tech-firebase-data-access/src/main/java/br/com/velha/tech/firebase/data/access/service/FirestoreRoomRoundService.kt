@@ -3,6 +3,7 @@ package br.com.velha.tech.firebase.data.access.service
 import br.com.velha.tech.firebase.models.GameBoardDocument
 import br.com.velha.tech.firebase.models.RoomDocument
 import br.com.velha.tech.firebase.models.RoundDocument
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -14,7 +15,13 @@ class FirestoreRoomRoundService : FirestoreService() {
     suspend fun startRound(roomId: String, roundDocument: RoundDocument): Unit = withContext(IO) {
         val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
         val roundDocumentRef = roomDocumentRef.collection(RoundDocument.COLLECTION_NAME).document(roundDocument.id)
-        val gameBoardDocument = GameBoardDocument()
+        val gameBoardDocument = GameBoardDocument(
+            matrix = listOf(
+                mapOf("0" to 0, "1" to 0, "2" to 0),
+                mapOf("0" to 0, "1" to 0, "2" to 0),
+                mapOf("0" to 0, "1" to 0, "2" to 0)
+            )
+        )
         val gameBoardDocumentRef = roundDocumentRef.collection(GameBoardDocument.COLLECTION_NAME).document(gameBoardDocument.id)
 
         db.runTransaction { transaction ->
@@ -54,6 +61,17 @@ class FirestoreRoomRoundService : FirestoreService() {
             .await()
 
         playingQuery.isEmpty && preparingQuery.isEmpty
+    }
+
+    suspend fun getPlayingRoundDocumentRef(roomId: String): DocumentReference? = withContext(IO) {
+        val playingQuery = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+            .collection(RoundDocument.COLLECTION_NAME)
+            .whereEqualTo(RoundDocument::playing.name, true)
+            .limit(1)
+            .get()
+            .await()
+
+        playingQuery.documents.firstOrNull()?.reference
     }
 
     fun addRoundListener(

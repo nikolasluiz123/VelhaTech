@@ -4,7 +4,7 @@ import java.util.UUID
 
 data class GameBoardDocument(
     val id: String = UUID.randomUUID().toString(),
-    val matrix: Map<String, Map<String, String>> = emptyMap()
+    var matrix:  List<Map<String, Int>> = emptyList()
 ): FirestoreDocument() {
 
     companion object {

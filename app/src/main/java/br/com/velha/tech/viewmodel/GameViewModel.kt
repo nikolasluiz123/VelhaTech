@@ -18,6 +18,7 @@ import br.com.velha.tech.navigation.gameScreenArgument
 import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
 import br.com.velha.tech.repository.RoomRoundRepository
+import br.com.velha.tech.repository.RoundGameBoardRepository
 import br.com.velha.tech.state.GameUIState
 import br.com.velha.tech.viewmodel.common.VelhaTechViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +34,7 @@ class GameViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
     private val roomPlayersRepository: RoomPlayersRepository,
     private val roundRepository: RoomRoundRepository,
+    private val gameBoardRepository: RoundGameBoardRepository,
     private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService,
     savedStateHandle: SavedStateHandle
 ): VelhaTechViewModel(context) {
@@ -60,16 +62,18 @@ class GameViewModel @Inject constructor(
                 },
                 gameBoardState = _uiState.value.gameBoardState.copy(
                     onInputBoardClick = { rowIndex: Int, columnIndex: Int ->
-                        val currentBoard = _uiState.value.gameBoardState.boardFigures
+                        launch {
+                            val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
+                            val currentBoard = _uiState.value.gameBoardState.boardFigures
 
-                        val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
-                        newBoard[rowIndex][columnIndex] = getPlayerFigure()
+                            val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
+                            newBoard[rowIndex][columnIndex] = getPlayerFigure()
 
-                        _uiState.value = _uiState.value.copy(
-                            gameBoardState = _uiState.value.gameBoardState.copy(
+                            gameBoardRepository.updateBoard(
+                                roomId = roomId,
                                 boardFigures = newBoard
                             )
-                        )
+                        }
                     }
                 )
             )
@@ -156,8 +160,30 @@ class GameViewModel @Inject constructor(
                         showBlockUIStartingGame(round)
                         reduceTimerStartingGame(args, round)
                     } else {
+                        addBoardListener()
                         hideBlockUI()
                     }
+                },
+                onError = {
+                    onShowError(it)
+                    onError(it)
+                }
+            )
+        }
+    }
+
+    private fun addBoardListener() {
+        launch {
+            val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
+
+            gameBoardRepository.addBoardListener(
+                roomId = args.roomId,
+                onSuccess = { boardFigures ->
+                    _uiState.value = _uiState.value.copy(
+                        gameBoardState = _uiState.value.gameBoardState.copy(
+                            boardFigures = boardFigures
+                        )
+                    )
                 },
                 onError = {
                     onShowError(it)
@@ -263,6 +289,7 @@ class GameViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         roomPlayersRepository.removeRoomPlayerListListener()
+        gameBoardRepository.removeBoardListener()
     }
 
     fun onBackClick(onSuccess: () -> Unit) {

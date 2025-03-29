@@ -5,9 +5,11 @@ import br.com.velha.tech.firebase.auth.implementations.FirebaseGoogleAuthenticat
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomRoundService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomService
+import br.com.velha.tech.firebase.data.access.service.FirestoreRoundGameBoardService
 import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
 import br.com.velha.tech.repository.RoomRoundRepository
+import br.com.velha.tech.repository.RoundGameBoardRepository
 import br.com.velha.tech.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -53,6 +55,15 @@ class SingletonRepositoryModule {
     ): RoomRoundRepository {
         return RoomRoundRepository(
             firestoreRoomRoundService = firestoreRoomRoundService,
+        )
+    }
+
+    @Provides
+    fun provideRoundGameBoardRepository(
+        firestoreRoundGameBoardService: FirestoreRoundGameBoardService,
+    ): RoundGameBoardRepository {
+        return RoundGameBoardRepository(
+            roundGameBoardService = firestoreRoundGameBoardService,
         )
     }
 

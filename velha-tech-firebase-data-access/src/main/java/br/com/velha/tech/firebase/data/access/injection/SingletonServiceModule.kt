@@ -4,6 +4,7 @@ import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticat
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomRoundService
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomService
+import br.com.velha.tech.firebase.data.access.service.FirestoreRoundGameBoardService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,5 +35,14 @@ class SingletonServiceModule {
     @Provides
     fun provideFirestoreRoomRoundService(): FirestoreRoomRoundService {
         return FirestoreRoomRoundService()
+    }
+
+    @Provides
+    fun provideFirestoreRoundGameBoardService(
+        roomRoundService: FirestoreRoomRoundService
+    ): FirestoreRoundGameBoardService {
+        return FirestoreRoundGameBoardService(
+            roomRoundService = roomRoundService
+        )
     }
 }
