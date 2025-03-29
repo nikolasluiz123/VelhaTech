@@ -1,5 +1,7 @@
 package br.com.velha.tech.firebase.data.access.service
 
+import br.com.velha.tech.core.enums.EnumDateTimePatterns
+import br.com.velha.tech.core.extensions.format
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velha.tech.firebase.models.PlayerDocument
 import br.com.velha.tech.firebase.models.RoomDocument
@@ -9,7 +11,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 class FirestoreRoomPlayersService(
-    private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService
+    private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService,
+    private val roomService: FirestoreRoomService
 ): FirestoreService() {
 
     fun addRoomPlayerListListener(
@@ -62,7 +65,12 @@ class FirestoreRoomPlayersService(
 
         if (player == null) {
             db.runTransaction { transaction ->
-                val playerDocument = PlayerDocument(user.id, user.name, roomDocument.playersCount == 0)
+                val playerDocument = PlayerDocument(
+                    userId = user.id,
+                    name = user.name,
+                    roomOwner = roomDocument.playersCount == 0,
+                    timer = roomService.getTimeForDifficultLevel(roomDocument.difficultLevel!!).format(EnumDateTimePatterns.TIME_WITH_SECONDS)
+                )
 
                 transaction.set(playersCollectionRef.document(user.id!!), playerDocument)
                 roomDocument.playersCount = oldPlayersCount + 1

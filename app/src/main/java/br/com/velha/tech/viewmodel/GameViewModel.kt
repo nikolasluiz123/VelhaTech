@@ -6,7 +6,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
+import br.com.velha.tech.core.enums.EnumDateTimePatterns
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
+import br.com.velha.tech.core.extensions.parseToLocalTime
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velha.tech.firebase.enums.EnumDifficultLevel
@@ -102,17 +104,8 @@ class GameViewModel @Inject constructor(
                 title = room.roomName!!,
                 gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState.copy(
                     totalRounds = room.roundsCount!!,
-                    time = getTimeForDifficultLevel(room.difficultLevel!!)
                 )
             )
-        }
-    }
-
-    private fun getTimeForDifficultLevel(level: EnumDifficultLevel): LocalTime {
-        return when (level) {
-            EnumDifficultLevel.EASY -> LocalTime.of(0, 0, 10)
-            EnumDifficultLevel.MEDIUM -> LocalTime.of(0, 0, 5)
-            EnumDifficultLevel.HARD -> LocalTime.of(0, 0, 2)
         }
     }
 
@@ -129,14 +122,17 @@ class GameViewModel @Inject constructor(
         roomPlayersRepository.addRoomPlayerListListener(
             roomId = args.roomId,
             onSuccess = { players ->
-                _uiState.value = _uiState.value.copy(
-                    subtitle = getSubtitle(players),
-                    players = players
-                )
-
                 val authenticatedPlayer = players.firstOrNull {
                     it.userId == commonFirebaseAuthenticationService.getAuthenticatedUser()!!.id
                 }
+
+                _uiState.value = _uiState.value.copy(
+                    subtitle = getSubtitle(players),
+                    players = players,
+                    gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState.copy(
+                        time = getLocalTimeFromAuthenticatedUser(authenticatedPlayer)
+                    )
+                )
 
                 if (players.size == 2 && authenticatedPlayer != null) {
                     startNewRound(authenticatedPlayer, args)
@@ -147,6 +143,10 @@ class GameViewModel @Inject constructor(
                 onError(exception)
             }
         )
+    }
+
+    private fun getLocalTimeFromAuthenticatedUser(authenticatedPlayer: TOPlayer?): LocalTime {
+        return authenticatedPlayer?.timer?.parseToLocalTime(EnumDateTimePatterns.TIME_WITH_SECONDS) ?: LocalTime.of(0, 0, 0)
     }
 
     private fun startNewRound(authenticatedPlayer: TOPlayer, args: GameScreenArgs) {
@@ -308,6 +308,7 @@ class GameViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         roomPlayersRepository.removeRoomPlayerListListener()
+        roundRepository.removeRoundListener()
         gameBoardRepository.removeBoardListener()
     }
 

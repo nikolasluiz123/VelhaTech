@@ -38,7 +38,8 @@ fun PlayerDocument.toTOPlayer(): TOPlayer {
         userId = userId!!,
         name = name!!,
         roomOwner = roomOwner,
-        figure = figure
+        figure = figure,
+        timer = timer
     )
 }
 
@@ -47,7 +48,8 @@ fun TOPlayer.toPlayerDocument(): PlayerDocument {
         userId = userId,
         name = name,
         roomOwner = roomOwner,
-        figure = figure
+        figure = figure,
+        timer = timer
     )
 }
 

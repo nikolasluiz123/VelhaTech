@@ -1,16 +1,15 @@
 package br.com.velha.tech.firebase.data.access.service
 
-import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
+import br.com.velha.tech.firebase.enums.EnumDifficultLevel
 import br.com.velha.tech.firebase.models.RoomDocument
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.time.LocalTime
 
-class FirestoreRoomService(
-    private val commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService
-): FirestoreService() {
+class FirestoreRoomService(): FirestoreService() {
 
     suspend fun saveRoom(room: RoomDocument): Unit = withContext(IO) {
         val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(room.id)
@@ -49,6 +48,16 @@ class FirestoreRoomService(
     suspend fun findRoomById(roomId: String): RoomDocument? = withContext(IO) {
         val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
         roomDocumentRef.get().await().toObject(RoomDocument::class.java)
+    }
+
+    fun getTimeForDifficultLevel(levelValue: String): LocalTime {
+        val level = EnumDifficultLevel.valueOf(levelValue)
+
+        return when (level) {
+            EnumDifficultLevel.EASY -> LocalTime.of(0, 0, 10)
+            EnumDifficultLevel.MEDIUM -> LocalTime.of(0, 0, 5)
+            EnumDifficultLevel.HARD -> LocalTime.of(0, 0, 2)
+        }
     }
 
 }

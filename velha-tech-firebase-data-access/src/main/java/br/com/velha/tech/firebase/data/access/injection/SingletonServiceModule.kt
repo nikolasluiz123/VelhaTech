@@ -19,16 +19,17 @@ class SingletonServiceModule {
         commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService
     ): FirestoreRoomService {
         return FirestoreRoomService(
-            commonFirebaseAuthenticationService = commonFirebaseAuthenticationService
         )
     }
 
     @Provides
     fun provideFirestoreRoomPlayersService(
-        commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService
+        commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService,
+        roomService: FirestoreRoomService
     ): FirestoreRoomPlayersService {
         return FirestoreRoomPlayersService(
-            commonFirebaseAuthenticationService = commonFirebaseAuthenticationService
+            commonFirebaseAuthenticationService = commonFirebaseAuthenticationService,
+            roomService = roomService
         )
     }
 

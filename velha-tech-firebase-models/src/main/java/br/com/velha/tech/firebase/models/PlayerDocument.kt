@@ -4,7 +4,8 @@ data class PlayerDocument(
     val userId: String? = null,
     val name: String? = null,
     val roomOwner: Boolean = false,
-    var figure: Int? = null
+    var figure: Int? = null,
+    var timer: String? = null
 ): FirestoreDocument() {
 
     companion object {

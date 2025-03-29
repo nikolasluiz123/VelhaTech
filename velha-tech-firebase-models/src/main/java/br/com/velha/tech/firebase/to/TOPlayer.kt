@@ -4,5 +4,6 @@ data class TOPlayer(
     val userId: String,
     val name: String,
     val roomOwner: Boolean,
-    val figure: Int? = null
+    val figure: Int? = null,
+    val timer: String? = null
 )
