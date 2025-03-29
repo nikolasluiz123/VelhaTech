@@ -33,14 +33,16 @@ class RoomRoundRepository(
         onSuccess: (TORound) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        roundListenerRegistration = firestoreRoomRoundService.addRoundListener(
-            roomId = roomId,
-            onSuccess = {
-                val result = it.toTORound()
-                onSuccess(result)
-            },
-            onError = onError
-        )
+        if (roundListenerRegistration == null) {
+            roundListenerRegistration = firestoreRoomRoundService.addRoundListener(
+                roomId = roomId,
+                onSuccess = {
+                    val result = it.toTORound()
+                    onSuccess(result)
+                },
+                onError = onError
+            )
+        }
     }
 
     fun removeRoundListener() {

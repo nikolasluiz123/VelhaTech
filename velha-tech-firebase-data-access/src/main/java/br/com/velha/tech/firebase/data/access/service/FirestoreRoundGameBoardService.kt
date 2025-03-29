@@ -17,7 +17,7 @@ class FirestoreRoundGameBoardService(
         val gameBoardDocument = gameBoardDocumentRef.get().await().toObject(GameBoardDocument::class.java)!!
 
         gameBoardDocument.matrix = boardFigures
-        gameBoardDocumentRef.update(gameBoardDocument.toMap())
+        gameBoardDocumentRef.update(gameBoardDocument.toMap()).await()
     }
 
     suspend fun addBoardListener(

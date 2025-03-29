@@ -42,7 +42,7 @@ class FirestoreRoomRoundService : FirestoreService() {
         }
 
         delay(1000)
-        roundDocumentRef.update(roundDocument.toMap())
+        roundDocumentRef.update(roundDocument.toMap()).await()
     }
 
     suspend fun getAllRoundsFinished(roomId: String): Boolean = withContext(IO) {

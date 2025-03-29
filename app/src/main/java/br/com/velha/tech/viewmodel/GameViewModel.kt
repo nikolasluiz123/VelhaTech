@@ -223,10 +223,6 @@ class GameViewModel @Inject constructor(
             if (round.timerToStart == 10) {
                 loadGameBoard(args.roomId)
                 addPlayerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
-
-                if (roomOwner) {
-                    selectPlayerToPlay(args.roomId)
-                }
             }
 
             if (round.preparingToStart) {
@@ -238,6 +234,10 @@ class GameViewModel @Inject constructor(
             } else {
                 addBoardListener(args.roomId)
                 hideBlockUI()
+
+                if (roomOwner) {
+                    selectPlayerToPlay(args.roomId)
+                }
             }
         }
     }
@@ -353,6 +353,7 @@ class GameViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         roomPlayersRepository.removeRoomPlayerListListener()
+        roomPlayersRepository.removePlayerListener()
         roundRepository.removeRoundListener()
         gameBoardRepository.removeBoardListener()
     }

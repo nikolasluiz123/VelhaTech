@@ -17,14 +17,16 @@ class RoomPlayersRepository(
         onSuccess: (List<TOPlayer>) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        roomPlayersListListener = firestoreRoomPlayersService.addRoomPlayerListListener(
-            roomId = roomId,
-            onSuccess = {
-                val result = it.map { it.toTOPlayer() }
-                onSuccess(result)
-            },
-            onError = onError
-        )
+        if (roomPlayersListListener == null) {
+            roomPlayersListListener = firestoreRoomPlayersService.addRoomPlayerListListener(
+                roomId = roomId,
+                onSuccess = {
+                    val result = it.map { it.toTOPlayer() }
+                    onSuccess(result)
+                },
+                onError = onError
+            )
+        }
     }
 
     fun addPlayerListener(
@@ -33,15 +35,17 @@ class RoomPlayersRepository(
         onSuccess: (TOPlayer) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        playerListener = firestoreRoomPlayersService.addPlayerListener(
-            roomId = roomId,
-            playerId = playerId,
-            onSuccess = {
-                val result = it.toTOPlayer()
-                onSuccess(result)
-            },
-            onError = onError
-        )
+        if (playerListener == null) {
+            playerListener = firestoreRoomPlayersService.addPlayerListener(
+                roomId = roomId,
+                playerId = playerId,
+                onSuccess = {
+                    val result = it.toTOPlayer()
+                    onSuccess(result)
+                },
+                onError = onError
+            )
+        }
     }
 
     suspend fun addAuthenticatedPlayerToRoom(roomId: String) {

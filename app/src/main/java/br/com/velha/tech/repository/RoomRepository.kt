@@ -24,13 +24,15 @@ class RoomRepository(
         onSuccess: (List<TORoom>) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        roomListListener = firestoreRoomService.addRoomListListener(
-            onSuccess = {
-                val result = it.map { it.toTORoom() }
-                onSuccess(result)
-            },
-            onError = onError
-        )
+        if (roomListListener == null) {
+            roomListListener = firestoreRoomService.addRoomListListener(
+                onSuccess = {
+                    val result = it.map { it.toTORoom() }
+                    onSuccess(result)
+                },
+                onError = onError
+            )
+        }
     }
 
     suspend fun findRoomById(roomId: String): TORoom? {

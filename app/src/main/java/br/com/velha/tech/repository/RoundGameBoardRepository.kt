@@ -21,14 +21,16 @@ class RoundGameBoardRepository(
         onSuccess: (Array<Array<Int>>) -> Unit,
         onError: (Exception) -> Unit
     ) {
-        boardListener = roundGameBoardService.addBoardListener(
-            roomId = roomId,
-            onSuccess = { matrix ->
-                val array = matrix.map { it.values.toTypedArray() }.toTypedArray()
-                onSuccess(array)
-            },
-            onError = onError
-        )
+        if (boardListener == null) {
+            boardListener = roundGameBoardService.addBoardListener(
+                roomId = roomId,
+                onSuccess = { matrix ->
+                    val array = matrix.map { it.values.toTypedArray() }.toTypedArray()
+                    onSuccess(array)
+                },
+                onError = onError
+            )
+        }
     }
 
     fun removeBoardListener() {
