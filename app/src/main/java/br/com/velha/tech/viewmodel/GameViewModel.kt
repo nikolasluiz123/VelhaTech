@@ -157,11 +157,11 @@ class GameViewModel @Inject constructor(
                 roundRepository.startNewRound(roomId = args.roomId, roundNumber = 1)
             }
 
-            addRoundListener()
+            addRoundListener(authenticatedPlayer.roomOwner)
         }
     }
 
-    private fun addRoundListener() {
+    private fun addRoundListener(roomOwner: Boolean) {
         launch {
             val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
@@ -174,7 +174,10 @@ class GameViewModel @Inject constructor(
 
                     if (round.preparingToStart) {
                         showBlockUIStartingGame(round)
-                        reduceTimerStartingGame(args, round)
+
+                        if (roomOwner) {
+                            reduceTimerStartingGame(args, round)
+                        }
                     } else {
                         addBoardListener()
                         hideBlockUI()
