@@ -2,15 +2,14 @@ package br.com.velha.tech.viewmodel
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
+import br.com.velha.tech.firebase.enums.EnumDifficultLevel
 import br.com.velha.tech.firebase.to.TOPlayer
 import br.com.velha.tech.firebase.to.TORound
 import br.com.velha.tech.navigation.GameScreenArgs
@@ -27,6 +26,7 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.LocalTime
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -46,7 +46,7 @@ class GameViewModel @Inject constructor(
 
     init {
         initialLoadUIState()
-        loadRoomName()
+        loadUIStateWithRoomInfos()
         addAuthenticatedPlayerToRoom()
         addRoomPlayerListListener()
     }
@@ -92,7 +92,7 @@ class GameViewModel @Inject constructor(
         return authenticatedPlayer?.figure!!
     }
 
-    private fun loadRoomName() {
+    private fun loadUIStateWithRoomInfos() {
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
         launch {
@@ -100,7 +100,19 @@ class GameViewModel @Inject constructor(
 
             _uiState.value = _uiState.value.copy(
                 title = room.roomName!!,
+                gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState.copy(
+                    totalRounds = room.roundsCount!!,
+                    time = getTimeForDifficultLevel(room.difficultLevel!!)
+                )
             )
+        }
+    }
+
+    private fun getTimeForDifficultLevel(level: EnumDifficultLevel): LocalTime {
+        return when (level) {
+            EnumDifficultLevel.EASY -> LocalTime.of(0, 0, 10)
+            EnumDifficultLevel.MEDIUM -> LocalTime.of(0, 0, 5)
+            EnumDifficultLevel.HARD -> LocalTime.of(0, 0, 2)
         }
     }
 
