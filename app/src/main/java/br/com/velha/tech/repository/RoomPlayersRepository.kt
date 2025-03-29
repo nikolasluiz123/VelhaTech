@@ -2,6 +2,7 @@ package br.com.velha.tech.repository
 
 import br.com.velha.tech.core.R
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
+import br.com.velha.tech.firebase.models.PlayerDocument
 import br.com.velha.tech.firebase.to.TOPlayer
 import com.google.firebase.firestore.ListenerRegistration
 
@@ -44,6 +45,11 @@ class RoomPlayersRepository(
             it.toTOPlayer()
         }
     }
+
+    suspend fun selectPlayerToPlay(roomId: String) {
+        return firestoreRoomPlayersService.selectPlayerToPlay(roomId)
+    }
+
 
     fun removeRoomPlayerListListener() {
         roomPlayersListListener?.remove()

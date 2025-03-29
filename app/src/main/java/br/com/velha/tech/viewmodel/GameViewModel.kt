@@ -11,7 +11,6 @@ import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
 import br.com.velha.tech.core.extensions.parseToLocalTime
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
-import br.com.velha.tech.firebase.enums.EnumDifficultLevel
 import br.com.velha.tech.firebase.to.TOPlayer
 import br.com.velha.tech.firebase.to.TORound
 import br.com.velha.tech.navigation.GameScreenArgs
@@ -63,26 +62,35 @@ class GameViewModel @Inject constructor(
                     )
                 },
                 gameBoardState = _uiState.value.gameBoardState.copy(
-                    onInputBoardClick = { rowIndex: Int, columnIndex: Int ->
-                        launch {
-                            val currentBoard = _uiState.value.gameBoardState.boardFigures
-                            val figureInPosition = currentBoard[rowIndex][columnIndex]
-
-                            if (figureInPosition == 0) {
-                                val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
-
-                                val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
-                                newBoard[rowIndex][columnIndex] = getPlayerFigure()
-
-                                gameBoardRepository.updateBoard(
-                                    roomId = roomId,
-                                    boardFigures = newBoard
-                                )
-                            }
-                        }
-                    }
+                    onInputBoardClick = ::onInputBoardClick
                 )
             )
+        }
+    }
+
+    private fun onInputBoardClick(rowIndex: Int, columnIndex: Int) {
+        launch {
+            val authenticatedUserId = commonFirebaseAuthenticationService.getAuthenticatedUser()!!.id
+            val player = _uiState.value.players.first { it.userId == authenticatedUserId }
+
+            if (player.playing) {
+                val currentBoard = _uiState.value.gameBoardState.boardFigures
+                val figureInPosition = currentBoard[rowIndex][columnIndex]
+
+                if (figureInPosition == 0) {
+                    val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
+
+                    val newBoard = currentBoard.map { it.copyOf() }.toTypedArray()
+                    newBoard[rowIndex][columnIndex] = getPlayerFigure()
+
+                    gameBoardRepository.updateBoard(
+                        roomId = roomId,
+                        boardFigures = newBoard
+                    )
+
+                    selectPlayerToPlay(roomId)
+                }
+            }
         }
     }
 
@@ -162,69 +170,73 @@ class GameViewModel @Inject constructor(
     }
 
     private fun addRoundListener(roomOwner: Boolean) {
-        launch {
-            val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
-
-            roundRepository.addRoundListener(
-                roomId = args.roomId,
-                onSuccess = { round ->
-                    if (round.timerToStart == 10) {
-                        loadGameBoard()
-                    }
-
-                    if (round.preparingToStart) {
-                        showBlockUIStartingGame(round)
-
-                        if (roomOwner) {
-                            reduceTimerStartingGame(args, round)
-                        }
-                    } else {
-                        addBoardListener()
-                        hideBlockUI()
-                    }
-                },
-                onError = {
-                    onShowError(it)
-                    onError(it)
-                }
-            )
-        }
-    }
-
-    private fun addBoardListener() {
-        launch {
-            val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
-
-            gameBoardRepository.addBoardListener(
-                roomId = args.roomId,
-                onSuccess = { boardFigures ->
-                    _uiState.value = _uiState.value.copy(
-                        gameBoardState = _uiState.value.gameBoardState.copy(
-                            boardFigures = boardFigures
-                        )
-                    )
-                },
-                onError = {
-                    onShowError(it)
-                    onError(it)
-                }
-            )
-        }
-    }
-
-    private fun loadGameBoard() {
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
 
-        launch {
-            val playersWithFigures = roomPlayersRepository.sortFiguresToPlayers(args.roomId)
+        roundRepository.addRoundListener(
+            roomId = args.roomId,
+            onSuccess = { round ->
+                onRoundChangeListener(round, args, roomOwner)
+            },
+            onError = {
+                onShowError(it)
+                onError(it)
+            }
+        )
+    }
 
-            _uiState.value = _uiState.value.copy(
-                players = playersWithFigures,
-                gameBoardState = _uiState.value.gameBoardState.copy(
-                    playersFigure = getFiguresPairList(playersWithFigures)
-                )
-            )
+    private fun onRoundChangeListener(round: TORound, args: GameScreenArgs, roomOwner: Boolean) {
+        launch {
+            if (round.timerToStart == 10) {
+                loadGameBoard(args.roomId)
+
+                if (roomOwner) {
+                    selectPlayerToPlay(args.roomId)
+                }
+            }
+
+            if (round.preparingToStart) {
+                showBlockUIStartingGame(round.timerToStart)
+
+                if (roomOwner) {
+                    reduceTimerStartingGame(args.roomId, round.id!!)
+                }
+            } else {
+                addBoardListener(args.roomId)
+                hideBlockUI()
+            }
         }
+    }
+
+    private suspend fun selectPlayerToPlay(roomId: String) {
+        roomPlayersRepository.selectPlayerToPlay(roomId)
+    }
+
+    private suspend fun addBoardListener(roomId: String) {
+        gameBoardRepository.addBoardListener(
+            roomId = roomId,
+            onSuccess = { boardFigures ->
+                _uiState.value = _uiState.value.copy(
+                    gameBoardState = _uiState.value.gameBoardState.copy(
+                        boardFigures = boardFigures
+                    )
+                )
+            },
+            onError = {
+                onShowError(it)
+                onError(it)
+            }
+        )
+    }
+
+    private suspend fun loadGameBoard(roomId: String) {
+        val playersWithFigures = roomPlayersRepository.sortFiguresToPlayers(roomId)
+
+        _uiState.value = _uiState.value.copy(
+            players = playersWithFigures,
+            gameBoardState = _uiState.value.gameBoardState.copy(
+                playersFigure = getFiguresPairList(playersWithFigures)
+            )
+        )
     }
 
     private fun getFiguresPairList(playersWithFigures: List<TOPlayer>): List<Pair<String, Drawable>> {
@@ -233,20 +245,18 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    private fun showBlockUIStartingGame(round: TORound) {
+    private fun showBlockUIStartingGame(timerToStart: Int?) {
         _uiState.value = _uiState.value.copy(
             blockUIMessageState = _uiState.value.blockUIMessageState.copy(
                 title = context.getString(R.string.game_screen_adversary_player_entered_title),
-                message = context.getString(R.string.game_screen_adversary_player_entered_message, round.timerToStart),
+                message = context.getString(R.string.game_screen_adversary_player_entered_message, timerToStart),
                 visible = true
             )
         )
     }
 
-    private fun reduceTimerStartingGame(args: GameScreenArgs, round: TORound) {
-        launch {
-            roundRepository.reduceRoundTimer(args.roomId, round.id!!)
-        }
+    private suspend fun reduceTimerStartingGame(roomId: String, roundId: String) {
+        roundRepository.reduceRoundTimer(roomId, roundId)
     }
 
     private fun hideBlockUI() {

@@ -105,4 +105,28 @@ class FirestoreRoomPlayersService(
 
         players
     }
+
+    suspend fun selectPlayerToPlay(roomId: String): Unit = withContext(IO) {
+        val roomDocumentRef = db.collection(RoomDocument.COLLECTION_NAME).document(roomId)
+        val playersCollectionRef = roomDocumentRef.collection(PlayerDocument.COLLECTION_NAME)
+        val documents = playersCollectionRef.get().await().documents
+        val players = documents.map { it.toObject(PlayerDocument::class.java)!! }
+
+        if (players.none { it.playing }) {
+            players.random().playing = true
+        } else {
+            players.forEach {
+                it.playing = !it.playing
+            }
+        }
+
+        db.runTransaction { transaction ->
+            players.forEach {
+                transaction.update(
+                    playersCollectionRef.document(it.userId!!),
+                    it.toMap()
+                )
+            }
+        }.await()
+    }
 }
