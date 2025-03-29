@@ -1,5 +1,6 @@
 package br.com.velha.tech.firebase.data.access.service
 
+import android.util.Log
 import br.com.velha.tech.core.enums.EnumDateTimePatterns
 import br.com.velha.tech.core.extensions.format
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
@@ -128,5 +129,30 @@ class FirestoreRoomPlayersService(
                 )
             }
         }.await()
+    }
+
+    fun addPlayerListener(
+        roomId: String,
+        playerId: String,
+        onSuccess: (PlayerDocument) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        val playerDocumentRef = db
+            .collection(RoomDocument.COLLECTION_NAME)
+            .document(roomId)
+            .collection(PlayerDocument.COLLECTION_NAME)
+            .document(playerId)
+
+        return playerDocumentRef.addSnapshotListener { value, error ->
+            if (error != null) {
+                onError(error)
+                return@addSnapshotListener
+            }
+
+            if (value != null && value.exists()) {
+                val player = value.toObject(PlayerDocument::class.java)!!
+                onSuccess(player)
+            }
+        }
     }
 }

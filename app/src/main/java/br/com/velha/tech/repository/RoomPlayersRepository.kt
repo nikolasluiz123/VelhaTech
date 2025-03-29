@@ -10,6 +10,7 @@ class RoomPlayersRepository(
     private val firestoreRoomPlayersService: FirestoreRoomPlayersService,
 ) {
     private var roomPlayersListListener: ListenerRegistration? = null
+    private var playerListener: ListenerRegistration? = null
 
     fun addRoomPlayerListListener(
         roomId: String,
@@ -20,6 +21,23 @@ class RoomPlayersRepository(
             roomId = roomId,
             onSuccess = {
                 val result = it.map { it.toTOPlayer() }
+                onSuccess(result)
+            },
+            onError = onError
+        )
+    }
+
+    fun addPlayerListener(
+        roomId: String,
+        playerId: String,
+        onSuccess: (TOPlayer) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        playerListener = firestoreRoomPlayersService.addPlayerListener(
+            roomId = roomId,
+            playerId = playerId,
+            onSuccess = {
+                val result = it.toTOPlayer()
                 onSuccess(result)
             },
             onError = onError
@@ -50,8 +68,11 @@ class RoomPlayersRepository(
         return firestoreRoomPlayersService.selectPlayerToPlay(roomId)
     }
 
-
     fun removeRoomPlayerListListener() {
         roomPlayersListListener?.remove()
+    }
+
+    fun removePlayerListener() {
+        playerListener?.remove()
     }
 }

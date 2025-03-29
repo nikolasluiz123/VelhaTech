@@ -53,4 +53,5 @@
     <string name="room_list_screen_full_room_message">Essa sala já está cheia.</string>
     <string name="game_screen_adversary_player_entered_title">O vai começar em breve!</string>
     <string name="game_screen_adversary_player_entered_message">O jogo iniciará automaticamente em %d segundos…</string>
+    <string name="game_screen_message_your_round_start">Sua vez de jogar %s</string>
 </resources>
