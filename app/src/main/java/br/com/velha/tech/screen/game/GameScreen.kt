@@ -1,5 +1,7 @@
 package br.com.velha.tech.screen.game
 
+import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -64,18 +66,17 @@ fun GameScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
+    BackHandler {
+        onBackClickWithConfirmation(state, context, onBackClick)
+    }
+
     Scaffold(
         topBar = {
             SimpleVelhaTechTopAppBar(
                 title = state.title,
                 subtitle = state.subtitle,
                 onBackClick = {
-                    state.messageDialogState.onShowDialog?.showConfirmationDialog(
-                        message = context.getString(R.string.game_screen_room_exit_confirm_message),
-                        onConfirm = {
-                            onBackClick()
-                        }
-                    )
+                    onBackClickWithConfirmation(state, context, onBackClick)
                 }
             )
         },
@@ -160,6 +161,15 @@ fun GameScreen(
             )
         }
     }
+}
+
+private fun onBackClickWithConfirmation(state: GameUIState, context: Context, onBackClick: () -> Unit) {
+    state.messageDialogState.onShowDialog?.showConfirmationDialog(
+        message = context.getString(R.string.game_screen_room_exit_confirm_message),
+        onConfirm = {
+            onBackClick()
+        }
+    )
 }
 
 @Preview(device = "id:small_phone")
