@@ -209,6 +209,7 @@ class FirestoreRoomPlayersService(
 
                 delay(1000)
                 playerTimerDocumentRef.update(playerTimerDocument.toMap()).await()
+                reducePlayerTimer(roomId, playerId)
             } else {
                 val roomDocument = roomDocumentRef.get().await().toObject(RoomDocument::class.java)!!
                 val startTime = roomService.getTimeForDifficultLevel(roomDocument.difficultLevel!!).format(TIME_WITH_SECONDS)
@@ -217,8 +218,6 @@ class FirestoreRoomPlayersService(
                 playerTimerDocumentRef.update(playerTimerDocument.toMap()).await()
                 selectPlayerToPlay(roomId)
             }
-
-            reducePlayerTimer(roomId, playerId)
         }
     }
 }
