@@ -5,7 +5,6 @@ data class PlayerDocument(
     val name: String? = null,
     val roomOwner: Boolean = false,
     var figure: Int? = null,
-    var timer: String? = null,
     var playing: Boolean = false,
 ): FirestoreDocument() {
 

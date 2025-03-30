@@ -14,7 +14,7 @@ class RoomRoundRepository(
         val document = RoundDocument(
             roundNumber = roundNumber,
             preparingToStart = true,
-            timerToStart = 10
+            timerToStart = 5
         )
 
         firestoreRoomRoundService.startRound(roomId, document)

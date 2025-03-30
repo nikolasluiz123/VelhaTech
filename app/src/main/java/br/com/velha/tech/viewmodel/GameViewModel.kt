@@ -2,14 +2,11 @@ package br.com.velha.tech.viewmodel
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
 import br.com.velha.tech.core.callback.showErrorDialog
-import br.com.velha.tech.core.enums.EnumDateTimePatterns
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
-import br.com.velha.tech.core.extensions.parseToLocalTime
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
 import br.com.velha.tech.firebase.to.TOPlayer
@@ -31,7 +28,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.time.LocalTime
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -54,12 +50,14 @@ class GameViewModel @Inject constructor(
 
     init {
         val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
+        val authenticatedUserId = getAuthenticatedUserId()!!
 
         initialLoadUIState()
         loadUIStateWithRoomInfos(args)
         addAuthenticatedPlayerToRoom(args)
         addRoomPlayerListListener(args)
-        addPlayerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+        addPlayerListener(roomId = args.roomId, playerId = authenticatedUserId)
+        addPlayerTimerListener(roomId = args.roomId, playerId = authenticatedUserId)
     }
 
     private fun initialLoadUIState() {
@@ -140,9 +138,6 @@ class GameViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     subtitle = getSubtitle(players),
                     players = players,
-                    gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState.copy(
-                        time = getLocalTimeFromAuthenticatedUser(authenticatedPlayer)
-                    )
                 )
 
                 if (players.size == 2 && authenticatedPlayer != null) {
@@ -156,27 +151,21 @@ class GameViewModel @Inject constructor(
         )
     }
 
-    private fun getAuthenticatedPlayer(players: List<TOPlayer>): TOPlayer? = players.firstOrNull {
-        it.userId == getAuthenticatedUserId()
-    }
-
-    private fun getAuthenticatedUserId(): String? {
-        return commonFirebaseAuthenticationService.getAuthenticatedUser()!!.id
-    }
-
     private fun addPlayerListener(playerId: String, roomId: String) {
         roomPlayersRepository.addPlayerListener(
             roomId = roomId,
             playerId = playerId,
             onSuccess = {
-                if (it.playing) {
-                    launch {
+                launch {
+                    if (it.playing) {
                         val message = context.getString(
                             R.string.game_screen_message_your_round_start,
                             it.name.split(" ").first()
                         )
 
                         _snackbarMessage.emit(message)
+
+                        roomPlayersRepository.reducePlayerTimer(roomId, playerId)
                     }
                 }
             },
@@ -187,8 +176,30 @@ class GameViewModel @Inject constructor(
         )
     }
 
-    private fun getLocalTimeFromAuthenticatedUser(authenticatedPlayer: TOPlayer?): LocalTime {
-        return authenticatedPlayer?.timer?.parseToLocalTime(EnumDateTimePatterns.TIME_WITH_SECONDS) ?: LocalTime.of(0, 0, 0)
+    private fun addPlayerTimerListener(playerId: String, roomId: String) {
+        roomPlayersRepository.addPlayerTimerListener(
+            roomId = roomId,
+            playerId = playerId,
+            onSuccess = { timer ->
+                _uiState.value = _uiState.value.copy(
+                    gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState.copy(
+                        time = timer
+                    )
+                )
+            },
+            onError = {
+                onShowError(it)
+                onError(it)
+            }
+        )
+    }
+
+    private fun getAuthenticatedPlayer(players: List<TOPlayer>): TOPlayer? = players.firstOrNull {
+        it.userId == getAuthenticatedUserId()
+    }
+
+    private fun getAuthenticatedUserId(): String? {
+        return commonFirebaseAuthenticationService.getAuthenticatedUser()!!.id
     }
 
     private fun startNewRound(authenticatedPlayer: TOPlayer, args: GameScreenArgs) {
@@ -223,6 +234,7 @@ class GameViewModel @Inject constructor(
             if (round.timerToStart == 10) {
                 loadGameBoard(args.roomId)
                 addPlayerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+                addPlayerTimerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
             }
 
             if (round.preparingToStart) {
@@ -354,6 +366,7 @@ class GameViewModel @Inject constructor(
         super.onCleared()
         roomPlayersRepository.removeRoomPlayerListListener()
         roomPlayersRepository.removePlayerListener()
+        roomPlayersRepository.removePlayerTimerListener()
         roundRepository.removeRoundListener()
         gameBoardRepository.removeBoardListener()
     }

@@ -5,6 +5,5 @@ data class TOPlayer(
     val name: String,
     val roomOwner: Boolean,
     val figure: Int? = null,
-    val timer: String? = null,
     var playing: Boolean = false,
 )

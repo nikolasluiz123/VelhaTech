@@ -1,16 +1,19 @@
 package br.com.velha.tech.repository
 
 import br.com.velha.tech.core.R
+import br.com.velha.tech.core.enums.EnumDateTimePatterns
+import br.com.velha.tech.core.extensions.parseToLocalTime
 import br.com.velha.tech.firebase.data.access.service.FirestoreRoomPlayersService
-import br.com.velha.tech.firebase.models.PlayerDocument
 import br.com.velha.tech.firebase.to.TOPlayer
 import com.google.firebase.firestore.ListenerRegistration
+import java.time.LocalTime
 
 class RoomPlayersRepository(
     private val firestoreRoomPlayersService: FirestoreRoomPlayersService,
 ) {
     private var roomPlayersListListener: ListenerRegistration? = null
     private var playerListener: ListenerRegistration? = null
+    private var playerTimerListener: ListenerRegistration? = null
 
     fun addRoomPlayerListListener(
         roomId: String,
@@ -48,6 +51,24 @@ class RoomPlayersRepository(
         }
     }
 
+    fun addPlayerTimerListener(
+        roomId: String,
+        playerId: String,
+        onSuccess: (LocalTime) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        if (playerTimerListener == null) {
+            playerTimerListener = firestoreRoomPlayersService.addPlayerTimerListener(
+                roomId = roomId,
+                playerId = playerId,
+                onSuccess = {
+                    onSuccess(it.timer?.parseToLocalTime(EnumDateTimePatterns.TIME_WITH_SECONDS)!!)
+                },
+                onError = onError
+            )
+        }
+    }
+
     suspend fun addAuthenticatedPlayerToRoom(roomId: String) {
         firestoreRoomPlayersService.addAuthenticatedPlayerToRoom(roomId)
     }
@@ -72,11 +93,19 @@ class RoomPlayersRepository(
         return firestoreRoomPlayersService.selectPlayerToPlay(roomId)
     }
 
+    suspend fun reducePlayerTimer(roomId: String, playerId: String) {
+        firestoreRoomPlayersService.reducePlayerTimer(roomId, playerId)
+    }
+
     fun removeRoomPlayerListListener() {
         roomPlayersListListener?.remove()
     }
 
     fun removePlayerListener() {
         playerListener?.remove()
+    }
+
+    fun removePlayerTimerListener() {
+        playerTimerListener?.remove()
     }
 }
