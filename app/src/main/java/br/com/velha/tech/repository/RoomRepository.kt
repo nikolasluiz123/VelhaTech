@@ -39,7 +39,12 @@ class RoomRepository(
         return firestoreRoomService.findRoomById(roomId)?.toTORoom()
     }
 
+    suspend fun finishGame(roomId: String, winnerUserId: String?) {
+        firestoreRoomService.finishGame(roomId, winnerUserId)
+    }
+
     fun removeRoomListListener() {
         roomListListener?.remove()
+        roomListListener = null
     }
 }

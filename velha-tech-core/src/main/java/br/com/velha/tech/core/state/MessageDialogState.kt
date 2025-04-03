@@ -11,5 +11,6 @@ data class MessageDialogState(
     val onShowDialog: IShowDialogCallback? = null,
     val onHideDialog: () -> Unit = { },
     val onConfirm: () -> Unit = { },
-    val onCancel: () -> Unit = { }
+    val onCancel: () -> Unit = { },
+    val customTitle: String? = null
 )

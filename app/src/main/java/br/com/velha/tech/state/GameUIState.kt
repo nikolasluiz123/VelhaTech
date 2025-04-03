@@ -23,11 +23,14 @@ data class GamePlayedRoundsListState(
     val expanded: Boolean = false,
     val time: LocalTime = LocalTime.of(0, 0, 0),
     val onToggleExpand: () -> Unit = { }
-)
+) {
+    val roundsToPlay: Int
+        get() = totalRounds - playedRounds.size
+}
 
 data class GameRoundItem(
     var roundNumber: Int,
-    var winnerName: String?
+    val winnerPlayer: TOPlayer? = null
 )
 
 data class GameBoardState(

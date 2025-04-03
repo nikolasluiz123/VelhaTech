@@ -99,13 +99,16 @@ class RoomPlayersRepository(
 
     fun removeRoomPlayerListListener() {
         roomPlayersListListener?.remove()
+        roomPlayersListListener = null
     }
 
     fun removePlayerListener() {
         playerListener?.remove()
+        playerListener = null
     }
 
     fun removePlayerTimerListener() {
         playerTimerListener?.remove()
+        playerTimerListener = null
     }
 }

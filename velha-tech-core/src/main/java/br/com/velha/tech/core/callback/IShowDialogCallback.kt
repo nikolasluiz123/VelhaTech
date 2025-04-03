@@ -4,7 +4,23 @@ import br.com.velha.tech.core.enums.EnumDialogType
 
 
 fun interface IShowDialogCallback {
-    fun onShow(type: EnumDialogType, message: String, onConfirm: () -> Unit, onCancel: () -> Unit)
+    fun onShow(type: EnumDialogType, message: String, onConfirm: () -> Unit, onCancel: () -> Unit, customTitle: String?)
+}
+
+fun IShowDialogCallback.showCustomDialog(
+    type: EnumDialogType,
+    customTitle: String,
+    message: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) {
+    this.onShow(
+        type = type,
+        message = message,
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        customTitle = customTitle
+    )
 }
 
 fun IShowDialogCallback.showErrorDialog(message: String) {
@@ -12,7 +28,8 @@ fun IShowDialogCallback.showErrorDialog(message: String) {
         type = EnumDialogType.ERROR,
         message = message,
         onConfirm = { },
-        onCancel = { }
+        onCancel = { },
+        customTitle = null
     )
 }
 
@@ -21,7 +38,8 @@ fun IShowDialogCallback.showConfirmationDialog(message: String, onConfirm: () ->
         type = EnumDialogType.CONFIRMATION,
         message = message,
         onConfirm = onConfirm,
-        onCancel = { }
+        onCancel = { },
+        customTitle = null
     )
 }
 
@@ -30,6 +48,7 @@ fun IShowDialogCallback.showInformationDialog(message: String) {
         type = EnumDialogType.INFORMATION,
         message = message,
         onConfirm = { },
-        onCancel = { }
+        onCancel = { },
+        customTitle = null
     )
 }

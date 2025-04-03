@@ -5,4 +5,7 @@
     <string name="enum_difficult_level_hard">Difícil</string>
     <string name="enum_round_type_md3">Melhor de 3</string>
     <string name="enum_round_type_md5">Melhor de 5</string>
+    <string name="enum_game_status_victory">Vitória</string>
+    <string name="enum_game_status_lose">Derrota</string>
+    <string name="enum_game_status_draw">Empate</string>
 </resources>

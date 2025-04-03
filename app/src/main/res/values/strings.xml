@@ -54,4 +54,13 @@
     <string name="game_screen_adversary_player_entered_title">O vai começar em breve!</string>
     <string name="game_screen_adversary_player_entered_message">O jogo iniciará automaticamente em %d segundos…</string>
     <string name="game_screen_message_your_round_start">Sua vez de jogar %s</string>
+    <string name="game_screen_winner_title">Você Venceu!</string>
+    <string name="game_screen_round_winner_message">Você venceu esse round, continue assim, ainda faltam %d rodadas.\n\nEm 5 segundos o próximo round vai começar.</string>
+    <string name="game_screen_loser_title">Você Perdeu!</string>
+    <string name="game_screen_loser_message">Não foi dessa vez, infelizmente você perdeu essa rodada, ainda restam mais %d, você consegue!\n\nEm 5 segundos a próxima rodada vai começar.</string>
+    <string name="game_screen_draw_title">Empate!</string>
+    <string name="game_screen_draw_message">Vocês empataram, ainda restam %d rodadas para que um de vocês chega a vitória!\n\nEm 5 segundos o próximo round vai começar.</string>
+    <string name="game_screen_game_winner_message">Parabéns, você venceu o jogo! Essa partida será adicionada em seu histórico e você poderá ver o resuldado dela sempre que quiser.</string>
+    <string name="game_screen_game_loser_message">Infelizmente você perdeu, essa partida ficará em seu histórico e você poderá rever o resultado se desejar.</string>
+    <string name="game_screen_game_draw_message">O jogo empatou! Você são igualmente bons e acabaram empatando, essa partida ficará no histórico de ambos e o resultado pode ser visto quando quiserem.</string>
 </resources>

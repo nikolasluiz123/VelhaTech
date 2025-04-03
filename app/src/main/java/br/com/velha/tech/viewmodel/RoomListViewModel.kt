@@ -77,14 +77,15 @@ class RoomListViewModel @Inject constructor(
 
     private fun initializeMessageDialogState(): MessageDialogState {
         return MessageDialogState(
-            onShowDialog = { type, message, onConfirm, onCancel ->
+            onShowDialog = { type, message, onConfirm, onCancel, customTitle ->
                 _uiState.value = _uiState.value.copy(
                     messageDialogState = _uiState.value.messageDialogState.copy(
                         dialogType = type,
                         dialogMessage = message,
                         showDialog = true,
                         onConfirm = onConfirm,
-                        onCancel = onCancel
+                        onCancel = onCancel,
+                        customTitle = customTitle
                     )
                 )
             },

@@ -35,5 +35,6 @@ class RoundGameBoardRepository(
 
     fun removeBoardListener() {
         boardListener?.remove()
+        boardListener = null
     }
 }

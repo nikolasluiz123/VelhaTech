@@ -2,10 +2,13 @@ package br.com.velha.tech.viewmodel
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.SavedStateHandle
 import br.com.velha.tech.R
+import br.com.velha.tech.core.callback.showCustomDialog
 import br.com.velha.tech.core.callback.showErrorDialog
+import br.com.velha.tech.core.enums.EnumDialogType
 import br.com.velha.tech.core.extensions.fromJsonNavParamToArgs
 import br.com.velha.tech.core.state.MessageDialogState
 import br.com.velha.tech.firebase.auth.implementations.CommonFirebaseAuthenticationService
@@ -17,6 +20,8 @@ import br.com.velha.tech.repository.RoomPlayersRepository
 import br.com.velha.tech.repository.RoomRepository
 import br.com.velha.tech.repository.RoomRoundRepository
 import br.com.velha.tech.repository.RoundGameBoardRepository
+import br.com.velha.tech.state.GamePlayedRoundsListState
+import br.com.velha.tech.state.GameRoundItem
 import br.com.velha.tech.state.GameUIState
 import br.com.velha.tech.viewmodel.common.VelhaTechViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -231,27 +236,61 @@ class GameViewModel @Inject constructor(
 
     private fun onRoundChangeListener(round: TORound, args: GameScreenArgs, roomOwner: Boolean) {
         launch {
-            if (round.timerToStart == 10) {
-                loadGameBoard(args.roomId)
-                addPlayerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
-                addPlayerTimerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+            loadGameBoard(args.roomId)
+            addRoundTimerListener(roomId = args.roomId, roundId = round.id!!, roomOwner = roomOwner)
+            addPlayerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+            addPlayerTimerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+
+            if (roomOwner && round.preparingToStart) {
+                reduceTimerStartingGame(args.roomId, round.id!!)
             }
 
-            if (round.preparingToStart) {
-                showBlockUIStartingGame(round.timerToStart)
-
-                if (roomOwner) {
-                    reduceTimerStartingGame(args.roomId, round.id!!)
-                }
-            } else {
+            if (round.playing) {
                 addBoardListener(args.roomId)
-                hideBlockUI()
-
-                if (roomOwner) {
-                    selectPlayerToPlay(args.roomId)
-                }
             }
+
+//            if (round.finished) {
+//                _uiState.value = _uiState.value.copy(
+//                    gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState.copy(
+//                        playedRounds = getPlayedRounds(round)
+//                    )
+//                )
+//            }
         }
+    }
+
+    private fun getPlayedRounds(round: TORound): List<GameRoundItem> {
+        val winnerPlayer = _uiState.value.players.firstOrNull { it.userId == round.winnerPlayerId }
+        val item = GameRoundItem(roundNumber = round.roundNumber!!, winnerPlayer = winnerPlayer)
+
+        val playedRounds = _uiState.value.gamePlayedRoundsListState.playedRounds.toMutableList()
+        playedRounds.add(item)
+
+        return playedRounds
+    }
+
+    private suspend fun addRoundTimerListener(roomId: String, roundId: String, roomOwner: Boolean) {
+        roundRepository.addRoundTimerListener(
+            roomId = roomId,
+            roundId = roundId,
+            onSuccess = { timer ->
+                if (timer > 0) {
+                    showBlockUIStartingGame(timer)
+                } else {
+                    launch {
+                        hideBlockUI()
+
+                        if (roomOwner) {
+                            selectPlayerToPlay(roomId)
+                        }
+                    }
+                }
+            },
+            onError = {
+                onShowError(it)
+                onError(it)
+            }
+        )
     }
 
     private suspend fun selectPlayerToPlay(roomId: String) {
@@ -267,11 +306,252 @@ class GameViewModel @Inject constructor(
                         boardFigures = boardFigures
                     )
                 )
+
+                verifyWinner(boardFigures)
             },
             onError = {
                 onShowError(it)
                 onError(it)
             }
+        )
+    }
+
+    private fun verifyWinner(boardFigures: Array<Array<Int>>) {
+        val figureWinner = getWinnerFigure(boardFigures)
+        val fullBoard = isFullBoard(boardFigures)
+        val gamePlayedRoundsListState = _uiState.value.gamePlayedRoundsListState
+
+        val totalRounds = gamePlayedRoundsListState.totalRounds
+        val playedRounds = gamePlayedRoundsListState.playedRounds
+        val decisiveRounds = if (totalRounds % 2 != 0) (totalRounds / 2) + 1 else null
+
+        if (decisiveRounds != null && playedRounds.size >= decisiveRounds) {
+//            processGameFinalization(
+//                playedRounds = playedRounds,
+//                decisiveRounds = decisiveRounds,
+//                totalRounds = totalRounds,
+//                figureWinner = figureWinner,
+//                gamePlayedRoundsListState = gamePlayedRoundsListState,
+//                fullBoard = fullBoard
+//            )
+
+        } else {
+            processRoundFinalization(
+                figureWinner = figureWinner,
+                gamePlayedRoundsListState = gamePlayedRoundsListState,
+                fullBoard = fullBoard
+            )
+        }
+    }
+
+    private fun processGameFinalization(
+        playedRounds: List<GameRoundItem>,
+        decisiveRounds: Int,
+        totalRounds: Int,
+        figureWinner: Int?,
+        gamePlayedRoundsListState: GamePlayedRoundsListState,
+        fullBoard: Boolean
+    ) {
+        val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
+        val authenticatedPlayer = getAuthenticatedPlayer(_uiState.value.players)!!
+        val authenticatedPlayerWins = playedRounds.count { it.winnerPlayer?.userId == authenticatedPlayer.userId }
+        val authenticatedPlayerLooses = playedRounds.count { it.winnerPlayer?.userId != authenticatedPlayer.userId && it.winnerPlayer != null }
+        val drawRounds = playedRounds.count { it.winnerPlayer == null }
+
+        when {
+            authenticatedPlayerWins >= decisiveRounds -> {
+                val winnerUserId = authenticatedPlayer.userId
+                showMessageGameWinner()
+                finishGame(roomId, winnerUserId)
+            }
+
+            authenticatedPlayerLooses >= decisiveRounds -> {
+                val winnerUserId = _uiState.value.players.first { it.userId != authenticatedPlayer.userId }.userId
+                showMessageGameLoser()
+                finishGame(roomId, winnerUserId)
+            }
+
+            drawRounds >= decisiveRounds && playedRounds.size < totalRounds -> {
+                processRoundFinalization(figureWinner, gamePlayedRoundsListState, fullBoard)
+            }
+
+            else -> {
+                showMessageGameDraw()
+                finishGame(roomId)
+            }
+        }
+    }
+
+    private fun finishGame(roomId: String, winnerUserId: String? = null) {
+        launch {
+            roomRepository.finishGame(roomId = roomId, winnerUserId = winnerUserId)
+        }
+    }
+
+    private fun processRoundFinalization(
+        figureWinner: Int?,
+        gamePlayedRoundsListState: GamePlayedRoundsListState,
+        fullBoard: Boolean
+    ) {
+        val authenticatedPlayer = getAuthenticatedPlayer(_uiState.value.players)!!
+
+        if (figureWinner != null) {
+            val winner = _uiState.value.players.first { it.figure!! == figureWinner }
+
+//            if (winner.userId == authenticatedPlayer.userId) {
+//                showMessageRoundWinner(gamePlayedRoundsListState.roundsToPlay)
+//            } else {
+//                showMessageRoundLoser(gamePlayedRoundsListState.roundsToPlay)
+//            }
+
+            prepareNextRound(authenticatedPlayer, winner)
+        } else if (fullBoard) {
+//            showMessageRoundDraw(gamePlayedRoundsListState.roundsToPlay)
+//            prepareNextRound(authenticatedPlayer, null)
+        }
+    }
+
+    private fun prepareNextRound(authenticatedPlayer: TOPlayer, winner: TOPlayer?) {
+        launch {
+            val roomId = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!.roomId
+
+            if (authenticatedPlayer.roomOwner) {
+                roundRepository.prepareNextRound(roomId, winner)
+            }
+
+            resetListenersNextRound(authenticatedPlayer)
+            clearGameBoardNextRound()
+        }
+    }
+
+    private fun resetListenersNextRound(authenticatedPlayer: TOPlayer) {
+        val args = jsonArgs?.fromJsonNavParamToArgs(GameScreenArgs::class.java)!!
+
+        roomPlayersRepository.removeRoomPlayerListListener()
+        roomPlayersRepository.removePlayerListener()
+        roomPlayersRepository.removePlayerTimerListener()
+        roundRepository.removeRoundListener()
+        roundRepository.removeRoundTimerListener()
+        gameBoardRepository.removeBoardListener()
+
+        addRoomPlayerListListener(args)
+        addPlayerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+        addPlayerTimerListener(roomId = args.roomId, playerId = getAuthenticatedUserId()!!)
+        addRoundListener(authenticatedPlayer.roomOwner)
+    }
+
+    private fun clearGameBoardNextRound() {
+        _uiState.value = _uiState.value.copy(
+            gameBoardState = _uiState.value.gameBoardState.copy(
+                boardFigures = Array(3) { arrayOf(0,0,0) }
+            )
+        )
+    }
+
+    private fun getWinnerFigure(boardFigures: Array<Array<Int>>): Int? {
+        val size = boardFigures.size
+
+        for (i in 0 until size) {
+            if (isLineFull(boardFigures, i)) {
+                return boardFigures[i][0]
+            }
+
+            if (isColumnFull(boardFigures, i, size)) {
+                return boardFigures[0][i]
+            }
+        }
+
+        if (isMainDiagonalFull(boardFigures, size)) {
+            return boardFigures[0][0]
+        }
+
+        if (isSecondaryDiagonalFull(boardFigures, size)) {
+            return boardFigures[0][size - 1]
+        }
+
+        return null
+    }
+
+    private fun isFullBoard(boardFigures: Array<Array<Int>>): Boolean {
+        return boardFigures.all { row -> row.all { it != 0 } }
+    }
+
+    private fun isLineFull(boardFigures: Array<Array<Int>>, i: Int): Boolean {
+        return boardFigures[i][0] != 0 && boardFigures[i].all { it == boardFigures[i][0] }
+    }
+
+    private fun isColumnFull(boardFigures: Array<Array<Int>>, i: Int, size: Int): Boolean {
+        return boardFigures[0][i] != 0 &&
+                (0 until size).all { boardFigures[it][i] == boardFigures[0][i] }
+    }
+
+    private fun isMainDiagonalFull(boardFigures: Array<Array<Int>>, size: Int): Boolean {
+        return boardFigures[0][0] != 0 &&
+                (0 until size).all { boardFigures[it][it] == boardFigures[0][0] }
+    }
+
+    private fun isSecondaryDiagonalFull(boardFigures: Array<Array<Int>>, size: Int): Boolean {
+        return boardFigures[0][size - 1] != 0 &&
+                (0 until size).all { boardFigures[it][size - 1 - it] == boardFigures[0][size - 1] }
+    }
+
+    private fun showMessageRoundWinner(roundsToPlay: Int) {
+        _uiState.value.messageDialogState.onShowDialog?.showCustomDialog(
+            type = EnumDialogType.INFORMATION,
+            customTitle = context.getString(R.string.game_screen_winner_title),
+            message = context.getString(R.string.game_screen_round_winner_message, roundsToPlay),
+            onConfirm = { },
+            onCancel = { }
+        )
+    }
+
+    private fun showMessageRoundLoser(roundsToPlay: Int) {
+        _uiState.value.messageDialogState.onShowDialog?.showCustomDialog(
+            type = EnumDialogType.INFORMATION,
+            customTitle = context.getString(R.string.game_screen_loser_title),
+            message = context.getString(R.string.game_screen_loser_message, roundsToPlay),
+            onConfirm = { },
+            onCancel = { }
+        )
+    }
+
+    private fun showMessageRoundDraw(roundsToPlay: Int) {
+        _uiState.value.messageDialogState.onShowDialog?.showCustomDialog(
+            type = EnumDialogType.INFORMATION,
+            customTitle = context.getString(R.string.game_screen_draw_title),
+            message = context.getString(R.string.game_screen_draw_message, roundsToPlay),
+            onConfirm = { },
+            onCancel = { }
+        )
+    }
+
+    private fun showMessageGameWinner() {
+        _uiState.value.messageDialogState.onShowDialog?.showCustomDialog(
+            type = EnumDialogType.INFORMATION,
+            customTitle = context.getString(R.string.game_screen_winner_title),
+            message = context.getString(R.string.game_screen_game_winner_message),
+            onConfirm = { },
+            onCancel = { }
+        )
+    }
+
+    private fun showMessageGameLoser() {
+        _uiState.value.messageDialogState.onShowDialog?.showCustomDialog(
+            type = EnumDialogType.INFORMATION,
+            customTitle = context.getString(R.string.game_screen_loser_title),
+            message = context.getString(R.string.game_screen_game_loser_message),
+            onConfirm = { },
+            onCancel = { }
+        )
+    }
+
+    private fun showMessageGameDraw() {
+        _uiState.value.messageDialogState.onShowDialog?.showCustomDialog(
+            type = EnumDialogType.INFORMATION,
+            customTitle = context.getString(R.string.game_screen_draw_title),
+            message = context.getString(R.string.game_screen_game_draw_message),
+            onConfirm = { },
+            onCancel = { }
         )
     }
 
@@ -335,14 +615,15 @@ class GameViewModel @Inject constructor(
 
     private fun initializeMessageDialogState(): MessageDialogState {
         return MessageDialogState(
-            onShowDialog = { type, message, onConfirm, onCancel ->
+            onShowDialog = { type, message, onConfirm, onCancel, customTitle ->
                 _uiState.value = _uiState.value.copy(
                     messageDialogState = _uiState.value.messageDialogState.copy(
                         dialogType = type,
                         dialogMessage = message,
                         showDialog = true,
                         onConfirm = onConfirm,
-                        onCancel = onCancel
+                        onCancel = onCancel,
+                        customTitle = customTitle
                     )
                 )
             },
@@ -368,6 +649,7 @@ class GameViewModel @Inject constructor(
         roomPlayersRepository.removePlayerListener()
         roomPlayersRepository.removePlayerTimerListener()
         roundRepository.removeRoundListener()
+        roundRepository.removeRoundTimerListener()
         gameBoardRepository.removeBoardListener()
     }
 

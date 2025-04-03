@@ -192,7 +192,7 @@ fun PlayedRoundItem(state: GameRoundItem) {
 
 @Composable
 private fun getWinnerText(state: GameRoundItem): String {
-    return state.winnerName?.let {
+    return state.winnerPlayer?.name?.let {
         stringResource(R.string.game_screen_rounds_list_label_winner, it)
     } ?: stringResource(R.string.game_screen_rounds_list_label_draw)
 }

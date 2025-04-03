@@ -15,9 +15,7 @@ import dagger.hilt.components.SingletonComponent
 class SingletonServiceModule {
 
     @Provides
-    fun provideFirestoreRoomService(
-        commonFirebaseAuthenticationService: CommonFirebaseAuthenticationService
-    ): FirestoreRoomService {
+    fun provideFirestoreRoomService(): FirestoreRoomService {
         return FirestoreRoomService(
         )
     }
@@ -34,8 +32,12 @@ class SingletonServiceModule {
     }
 
     @Provides
-    fun provideFirestoreRoomRoundService(): FirestoreRoomRoundService {
-        return FirestoreRoomRoundService()
+    fun provideFirestoreRoomRoundService(
+        roomService: FirestoreRoomService
+    ): FirestoreRoomRoundService {
+        return FirestoreRoomRoundService(
+            roomService = roomService
+        )
     }
 
     @Provides

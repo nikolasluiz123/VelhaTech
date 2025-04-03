@@ -24,20 +24,21 @@ class FirestoreRoundGameBoardService(
         roomId: String,
         onSuccess: (List<Map<String, Int>>) -> Unit,
         onError: (Exception) -> Unit
-    ): ListenerRegistration {
-        val roundDocumentRef = roomRoundService.getPlayingRoundDocumentRef(roomId)!!
-        val gameBoardCollection = roundDocumentRef.collection(GameBoardDocument.COLLECTION_NAME)
-        val gameBoardDocumentRef = gameBoardCollection.limit(1).get().await().documents.firstOrNull()?.reference!!
+    ): ListenerRegistration? {
+        return roomRoundService.getPlayingRoundDocumentRef(roomId)?.let { roundDocumentRef ->
+            val gameBoardCollection = roundDocumentRef.collection(GameBoardDocument.COLLECTION_NAME)
+            val gameBoardDocumentRef = gameBoardCollection.limit(1).get().await().documents.firstOrNull()?.reference!!
 
-        return gameBoardDocumentRef.addSnapshotListener { value, error ->
-            if (error != null) {
-                onError(error)
-                return@addSnapshotListener
-            }
+            gameBoardDocumentRef.addSnapshotListener { value, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
 
-            if (value != null) {
-                val gameBoardDocument = value.toObject(GameBoardDocument::class.java)!!
-                onSuccess(gameBoardDocument.matrix)
+                if (value != null) {
+                    val gameBoardDocument = value.toObject(GameBoardDocument::class.java)!!
+                    onSuccess(gameBoardDocument.matrix)
+                }
             }
         }
     }
